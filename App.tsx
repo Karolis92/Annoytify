@@ -1,49 +1,47 @@
-import notifee, { EventType } from '@notifee/react-native';
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, View } from "react-native";
+import { NotificationChannels } from "./src/enum/NotificationChannels";
+import { PressAction } from "./src/enum/PressAction";
+import { useNotificationEventListener } from "./src/hooks/useNotificationEventListener";
+import { notificationService } from "./src/services/notificationService";
 
 export default function App() {
-  async function displayNotification() {
-    await notifee.requestPermission()
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
+  useNotificationEventListener();
 
-    await notifee.displayNotification({
+  async function showNotification() {
+    await notificationService.requestPermission();
+
+    await notificationService.displayNotification({
       id: "notification1",
-      title: 'Title',
-      body: 'Content',
+      title: "Title",
+      body: "Content",
       android: {
-        channelId,
+        channelId: NotificationChannels.Reminders,
         ongoing: true,
-        // pressAction is needed if you want the notification to open the app when pressed
-        pressAction: {
-          id: 'default',
-        },
+        autoCancel: false,
+        pressAction: { id: PressAction.Default },
+        actions: [
+          {
+            title: "Done",
+            pressAction: {
+              id: PressAction.Done,
+            },
+          },
+        ],
       },
     });
-
-    const unsub = notifee.onForegroundEvent(({ type, detail }) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          console.log('User dismissed notification', detail.notification?.id);
-          unsub()
-          break;
-      }
-    })
   }
 
   return (
     <View style={styles.container}>
-      <Button title="Display Notification" onPress={() => displayNotification()} />
+      <Button title="Display Notification" onPress={() => showNotification()} />
     </View>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
