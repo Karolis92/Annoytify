@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 apply plugin: "com.facebook.react"
 
-group = 'app.anoytify.modules.onboot'
+group = 'app.annoytify.modules.onboot'
 version = '0.2.0'
 
 buildscript {
@@ -63,7 +63,7 @@ android {
     jvmTarget = JavaVersion.VERSION_11.majorVersion
   }
 
-  namespace "app.anoytify.modules.onboot"
+  namespace "app.annoytify.modules.onboot"
   defaultConfig {
     minSdkVersion safeExtGet("minSdkVersion", 21)
     targetSdkVersion safeExtGet("targetSdkVersion", 33)

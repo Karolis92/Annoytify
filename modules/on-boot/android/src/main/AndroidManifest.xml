@@ -1,6 +1,6 @@
 <manifest
   xmlns:android="http://schemas.android.com/apk/res/android"
-  package="app.anoytify.modules.onboot"
+  package="app.annoytify.modules.onboot"
 >
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <application>

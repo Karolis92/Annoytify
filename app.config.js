@@ -1,8 +1,8 @@
 const APP_VARIANT = process.env.APP_VARIANT;
 
 export default {
-  name: APP_VARIANT ? `Anoytify (${APP_VARIANT})` : "Anoytify",
-  slug: "anoytify",
+  name: APP_VARIANT ? `Annoytify (${APP_VARIANT})` : "Annoytify",
+  slug: "annoytify",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
@@ -21,7 +21,7 @@ export default {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    package: APP_VARIANT ? `app.anoytify.${APP_VARIANT}` : "app.anoytify",
+    package: APP_VARIANT ? `app.annoytify.${APP_VARIANT}` : "app.annoytify",
   },
   web: {
     favicon: "./assets/favicon.png",
