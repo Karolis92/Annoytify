@@ -4,11 +4,13 @@ import notifee, {
   Notification,
   Trigger,
 } from "@notifee/react-native";
+import { registerOnBootTask } from "../../modules/on-boot";
 import { NotificationChannels } from "../enum/NotificationChannels";
 import { PressAction } from "../enum/PressAction";
 
 class NotificationService {
   constructor() {
+    this.registerBootTask();
     this.listenBackgroundEvents();
     this.setupNotificationChannels();
   }
@@ -22,6 +24,10 @@ class NotificationService {
 
   listenBackgroundEvents() {
     return notifee.onBackgroundEvent(this.eventListener);
+  }
+
+  registerBootTask() {
+    registerOnBootTask(async () => this.showTestNotification());
   }
 
   listenForegroundEvents() {
@@ -38,6 +44,28 @@ class NotificationService {
 
   createTriggerNotification(notification: Notification, trigger: Trigger) {
     return notifee.createTriggerNotification(notification, trigger);
+  }
+
+  showTestNotification() {
+    this.displayNotification({
+      id: "notification1",
+      title: "Title",
+      body: "Content",
+      android: {
+        channelId: NotificationChannels.Reminders,
+        ongoing: true,
+        autoCancel: false,
+        pressAction: { id: PressAction.Default },
+        actions: [
+          {
+            title: "Done",
+            pressAction: {
+              id: PressAction.Done,
+            },
+          },
+        ],
+      },
+    });
   }
 
   private async eventListener({ type, detail }: Event) {
