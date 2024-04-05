@@ -16,7 +16,7 @@ App can also be built locally with Android Studio and used with emulator (`start
 
 `start:dev` - run development server for development build
 
-`start:dev:emulator` - build and start app on local machine for android emulator ([prerequisites](prerequisites) needed)
+`start:dev:emulator` - build and start app on local machine for android emulator ([prerequisites](https://docs.expo.dev/guides/local-app-development/#android) needed)
 
 `build` - build production app (aab) using EAS
 
