@@ -1,13 +1,21 @@
-import { useNotificationEventListener } from "./src/hooks/useNotificationEventListener";
-import RootNavigation from "./src/navigation/RootNavigation";
+import { useEffect } from "react";
+import "react-native-get-random-values";
+import AppRealmProvider from "./src/common/db/AppRealmProvider";
+import { notificationService } from "./src/common/services/notificationService";
+import RootNavigator from "./src/navigation/RootNavigator";
 import AppThemeProvider from "./src/theme/AppTheme";
 
 export default function App() {
-  useNotificationEventListener();
+  useEffect(() => {
+    const unsubscribe = notificationService.listenForegroundEvents();
+    return unsubscribe;
+  }, []);
 
   return (
-    <AppThemeProvider>
-      <RootNavigation />
-    </AppThemeProvider>
+    <AppRealmProvider>
+      <AppThemeProvider>
+        <RootNavigator />
+      </AppThemeProvider>
+    </AppRealmProvider>
   );
 }

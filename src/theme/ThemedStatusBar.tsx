@@ -10,7 +10,7 @@ const ThemedStatusBar = () => {
       barStyle={
         themeName.startsWith("light") ? "dark-content" : "light-content"
       }
-      backgroundColor={theme.backgroundStrong.get()}
+      backgroundColor={theme.background.get()}
     />
   );
 };

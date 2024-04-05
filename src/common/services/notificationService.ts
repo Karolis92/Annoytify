@@ -4,9 +4,9 @@ import notifee, {
   Notification,
   Trigger,
 } from "@notifee/react-native";
-import { registerOnBootTask } from "../../modules/on-boot";
-import { NotificationChannels } from "../enum/NotificationChannels";
-import { PressAction } from "../enum/PressAction";
+import { registerOnBootTask } from "../../../modules/on-boot";
+import { NotificationChannels } from "../enums/NotificationChannels";
+import { PressAction } from "../enums/PressAction";
 
 class NotificationService {
   constructor() {

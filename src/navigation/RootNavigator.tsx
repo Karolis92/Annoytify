@@ -3,23 +3,26 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft, Settings2 } from "@tamagui/lucide-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, useTheme } from "tamagui";
-import TasksScreen from "../screens/TasksScreen/TasksScreen";
-import SettingsScreen from "../screens/SettingsScreen/SettingsScreen";
+import TasksScreen from "../tasks/TasksScreen";
+import SettingsScreen from "../settings/SettingsScreen";
 import RootNavigatorParamList from "./RootNavigatorParamList";
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
 
-const RootNavigation = () => {
+const RootNavigator = () => {
   const theme = useTheme();
 
   return (
-    <SafeAreaProvider style={{ backgroundColor: theme.background.get() }}>
+    <SafeAreaProvider
+      // match navigation animation background
+      style={{ backgroundColor: theme.background.get() }}
+    >
       <NavigationContainer
         theme={{
           dark: true,
           colors: {
             background: theme.background.get(),
-            border: theme.blue10.get(),
+            border: theme.borderColor.get(),
             card: theme.background.get(),
             notification: theme.background.get(),
             primary: theme.background.get(),
@@ -70,4 +73,4 @@ const RootNavigation = () => {
   );
 };
 
-export default RootNavigation;
+export default RootNavigator;
