@@ -32,12 +32,21 @@ const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
             </Checkbox.Indicator>
           </Checkbox>
           <View flexShrink={1}>
-            <Text textDecorationLine={textDecorationLine} fontSize="$5" mb="$2">
+            <Text
+              textDecorationLine={textDecorationLine}
+              numberOfLines={1}
+              fontSize="$5"
+              mb="$2"
+            >
               {task.title}
             </Text>
-            <Text textDecorationLine={textDecorationLine}>
-              {task.description}
-            </Text>
+            {task.description &&
+              <Text
+                textDecorationLine={textDecorationLine}
+                numberOfLines={4}
+              >
+                {task.description}
+              </Text>}
           </View>
         </XStack>
       </Card.Header>

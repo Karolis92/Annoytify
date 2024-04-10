@@ -44,6 +44,8 @@ const TasksScreen = () => {
       <Sheet
         open={sheetState.open}
         onOpenChange={(open: boolean) => setSheetState({ ...sheetState, open })}
+        snapPointsMode="percent"
+        snapPoints={[95]}
       >
         <TaskForm
           taskId={sheetState.taskId}
