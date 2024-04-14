@@ -3,6 +3,9 @@
 Android app to schedule annoying todo notifications that are impossible to accidentally swipe away and forget.
 Works with Android 14 where it's possible for user to swipe away persistent (ongoing) notifications.
 
+## WIP
+App is still work in progress
+
 ## Setup
 
 App will not work with Expo Go as it utilizes native code to restore notification after boot. Also uses some libraries that provide only native code.
