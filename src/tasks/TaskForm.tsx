@@ -8,6 +8,7 @@ import DateSelect from "../common/components/DateSelect";
 import Select from "../common/components/Select";
 import { Repeat } from "../common/enums/Repeat";
 import { ITask, Task } from "./db/models";
+import notificationsService from "./services/notificationsService";
 
 interface TaskForm {
   taskId?: BSON.ObjectId;
@@ -43,7 +44,8 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
       setTitleError("Title is required")
       return
     }
-    realm.write(() => realm.create(Task, formState, UpdateMode.Modified));
+    const task = realm.write(() => realm.create(Task, formState, UpdateMode.Modified));
+    notificationsService.scheduleNotification(task)
     onClose();
     ToastAndroid.show(
       existingTask ? "Task updated!" : "Task created!",
