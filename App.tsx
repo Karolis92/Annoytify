@@ -1,15 +1,11 @@
-import { useEffect } from "react";
 import "react-native-get-random-values";
 import AppRealmProvider from "./src/common/db/AppRealmProvider";
-import notificationsService from "./src/tasks/services/notificationsService";
 import RootNavigator from "./src/navigation/RootNavigator";
+import useTaskNotificationEvents from "./src/tasks/useTaskNotificationEvents";
 import AppThemeProvider from "./src/theme/AppTheme";
 
 export default function App() {
-  useEffect(() => {
-    const unsubscribe = notificationsService.listenForegroundEvents();
-    return unsubscribe;
-  }, []);
+  useTaskNotificationEvents();
 
   return (
     <AppRealmProvider>

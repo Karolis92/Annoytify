@@ -2,13 +2,22 @@ import { useQuery, useRealm } from "@realm/react";
 import { Save, Trash2, X } from "@tamagui/lucide-icons";
 import { useState } from "react";
 import { ToastAndroid } from "react-native";
-import { BSON, UpdateMode } from "realm";
-import { Button, Form, Input, Label, ScrollView, Text, TextArea, View } from "tamagui";
+import { BSON } from "realm";
+import {
+  Button,
+  Form,
+  Input,
+  Label,
+  ScrollView,
+  Text,
+  TextArea,
+  View,
+} from "tamagui";
 import DateSelect from "../common/components/DateSelect";
 import Select from "../common/components/Select";
 import { Repeat } from "../common/enums/Repeat";
 import { ITask, Task } from "./db/models";
-import notificationsService from "./services/notificationsService";
+import tasksService from "./services/tasksService";
 
 interface TaskForm {
   taskId?: BSON.ObjectId;
@@ -17,11 +26,11 @@ interface TaskForm {
 
 const TaskForm = ({ taskId, onClose }: TaskForm) => {
   const realm = useRealm();
-  const [titleError, setTitleError] = useState<string>()
+  const [titleError, setTitleError] = useState<string>();
   const [existingTask] = useQuery(
     Task,
     (tasks) => tasks.filtered("_id == $0", taskId),
-    [taskId]
+    [taskId],
   );
 
   const [formState, setFormState] = useState<ITask>(() => ({
@@ -35,37 +44,33 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
 
   const changeHandler =
     (field: string) =>
-      <T,>(value: T) => {
-        setFormState({ ...formState, [field]: value });
-      };
+    <T,>(value: T) => {
+      setFormState({ ...formState, [field]: value });
+    };
 
   const onSubmit = () => {
     if (!formState.title) {
-      setTitleError("Title is required")
-      return
+      setTitleError("Title is required");
+      return;
     }
-    const task = realm.write(() => realm.create(Task, formState, UpdateMode.Modified));
-    notificationsService.scheduleNotification(task)
+    tasksService.createOrUpdate(formState);
     onClose();
     ToastAndroid.show(
       existingTask ? "Task updated!" : "Task created!",
-      ToastAndroid.SHORT
+      ToastAndroid.SHORT,
     );
   };
 
   const onDelete = () => {
-    realm.write(() => realm.delete(existingTask));
-    onClose();
-    ToastAndroid.show("Task deleted!", ToastAndroid.SHORT);
+    if (existingTask) {
+      tasksService.delete(existingTask);
+      onClose();
+      ToastAndroid.show("Task deleted!", ToastAndroid.SHORT);
+    }
   };
 
   return (
-    <Form
-      gap="$2"
-      p="$3"
-      flex={1}
-      onSubmit={onSubmit}
-    >
+    <Form gap="$2" p="$3" flex={1} onSubmit={onSubmit}>
       <ScrollView>
         <View>
           <Label htmlFor="task-title">Title</Label>
@@ -75,7 +80,11 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
             value={formState.title}
             onChangeText={changeHandler("title")}
           />
-          {titleError && <Text color="$red9" mt="$2">{titleError}</Text>}
+          {titleError && (
+            <Text color="$red9" mt="$2">
+              {titleError}
+            </Text>
+          )}
         </View>
         <View>
           <Label htmlFor="task-description">Description</Label>

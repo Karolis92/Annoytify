@@ -1,19 +1,16 @@
-import { useRealm } from "@realm/react";
 import { CalendarClock, Check, Repeat2 } from "@tamagui/lucide-icons";
 import { Card, CardProps, Checkbox, Text, View, XStack } from "tamagui";
 import { Repeat } from "../common/enums/Repeat";
 import { Task } from "./db/models";
+import tasksService from "./services/tasksService";
 
 interface TaskCardProps extends CardProps {
   task: Task;
 }
 
 const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
-  const realm = useRealm();
   const onDoneChange = (done: boolean) => {
-    realm.write(() => {
-      task.done = done;
-    });
+    tasksService.changeState(task, done);
   };
 
   const textDecorationLine = task.done ? "line-through" : undefined;
@@ -40,13 +37,11 @@ const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
             >
               {task.title}
             </Text>
-            {task.description &&
-              <Text
-                textDecorationLine={textDecorationLine}
-                numberOfLines={4}
-              >
+            {task.description && (
+              <Text textDecorationLine={textDecorationLine} numberOfLines={4}>
                 {task.description}
-              </Text>}
+              </Text>
+            )}
           </View>
         </XStack>
       </Card.Header>
