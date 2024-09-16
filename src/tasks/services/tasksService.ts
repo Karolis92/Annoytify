@@ -23,18 +23,16 @@ class TasksService {
     });
   }
 
-  get(id: string) {
-    return tasksRepository.get(id);
-  }
-
   createOrUpdate(task: ITask) {
-    tasksRepository.upsert(task);
-    this.scheduleTaskNotification(task);
+    const newTask = tasksRepository.upsert(task);
+    this.scheduleTaskNotification(newTask);
+    return newTask;
   }
 
   private createNextReocurance(task: Task) {
-    if (task.repeat !== Repeat.Once) {
-      this.createOrUpdate({
+    const existing = task.next && tasksRepository.get(task.next);
+    if (!existing && task.repeat !== Repeat.Once) {
+      const newTask = this.createOrUpdate({
         ...task,
         _id: new BSON.ObjectId(),
         done: false,
@@ -42,6 +40,10 @@ class TasksService {
           task.repeat === Repeat.Daily
             ? getNextDailyOccurence(task.date)
             : getNextMonthlyOccurence(task.date),
+      });
+      this.createOrUpdate({
+        ...task,
+        next: newTask._id,
       });
     }
   }

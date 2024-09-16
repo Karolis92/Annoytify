@@ -8,6 +8,7 @@ export interface ITask {
   date: Date;
   repeat: Repeat;
   done: boolean;
+  next?: BSON.ObjectId;
 }
 
 export class Task extends Realm.Object<Task> implements ITask {
@@ -17,6 +18,7 @@ export class Task extends Realm.Object<Task> implements ITask {
   date!: Date;
   repeat!: Repeat;
   done!: boolean;
+  next?: BSON.ObjectId;
 
   static schema: ObjectSchema = {
     name: "Task",
@@ -27,6 +29,7 @@ export class Task extends Realm.Object<Task> implements ITask {
       date: "date",
       repeat: "string",
       done: "bool",
+      next: "objectId?",
     },
     primaryKey: "_id",
   };

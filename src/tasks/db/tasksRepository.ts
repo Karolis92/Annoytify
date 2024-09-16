@@ -3,7 +3,7 @@ import realm from "../../common/db/realm";
 import { ITask, Task } from "./models";
 
 class TasksRepository {
-  get(id: string) {
+  get(id: string | BSON.ObjectId) {
     return realm.objectForPrimaryKey(Task, new BSON.ObjectId(id));
   }
 
