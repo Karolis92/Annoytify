@@ -46,7 +46,7 @@ const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
         </XStack>
       </Card.Header>
       <Card.Footer p="$3" pt="0" gap="$2" alignItems="center">
-        {task.repeat !== Repeat.Once && <Repeat2 size="$1" />}
+        {task.repeat !== Repeat.No && <Repeat2 size="$1" />}
         <View flexDirection="row" alignItems="center" gap="$2" ml="auto">
           <CalendarClock size="$1" />
           <Text textDecorationLine={textDecorationLine}>

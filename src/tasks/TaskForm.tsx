@@ -38,7 +38,7 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
     title: existingTask?.title ?? "",
     description: existingTask?.description ?? "",
     date: existingTask?.date ?? new Date(),
-    repeat: existingTask?.repeat ?? Repeat.Once,
+    repeat: existingTask?.repeat ?? Repeat.No,
     done: false,
   }));
 
@@ -110,7 +110,7 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
             id="task-repeat"
             value={formState.repeat}
             items={[
-              { value: Repeat.Once, text: "Once" },
+              { value: Repeat.No, text: "No" },
               { value: Repeat.Daily, text: "Daily" },
               { value: Repeat.Monthly, text: "Monthly" },
             ]}

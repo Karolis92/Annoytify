@@ -3,11 +3,12 @@ import { Task, TasksModels } from "../../tasks/db/models";
 
 const realmCfg: Configuration = {
   schema: [...TasksModels],
-  schemaVersion: 1,
+  schemaVersion: 2,
   onMigration: (oldRealm, newRealm) => {
-    console.log(oldRealm.schemaVersion, newRealm.schemaVersion);
-    if (oldRealm.schemaVersion < 1) {
-      newRealm.objects(Task).forEach((t) => (t.next = undefined));
+    if (oldRealm.schemaVersion < 2) {
+      newRealm.objects(Task).forEach((t) => {
+        "next" in t && delete t.next;
+      });
     }
   },
 };

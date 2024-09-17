@@ -23,16 +23,45 @@ class TasksService {
     });
   }
 
-  createOrUpdate(task: ITask) {
+  async createOrUpdate(task: ITask) {
     const newTask = tasksRepository.upsert(task);
-    this.scheduleTaskNotification(newTask);
+    // remove notification if already shown
+    await notificationsService.cancelNotification(newTask._id.toString());
+    // schedule new notification
+    if (!newTask.done) {
+      await notificationsService.scheduleNotification(
+        this.createNotification(task),
+        task.date,
+      );
+    }
     return newTask;
   }
 
-  private createNextReocurance(task: Task) {
-    const existing = task.next && tasksRepository.get(task.next);
-    if (!existing && task.repeat !== Repeat.Once) {
-      const newTask = this.createOrUpdate({
+  async delete(task: Task) {
+    const id = task._id.toString(); // grab id before deletion to avoid error
+    tasksRepository.delete(task);
+    await notificationsService.cancelNotification(id);
+  }
+
+  async changeStateById(id: string, done = true) {
+    const task = tasksRepository.get(id);
+    if (task) {
+      await this.changeState(task, done);
+    }
+  }
+
+  async changeState(task: Task, done = true) {
+    if (done) {
+      await this.createNextReocurance(task);
+      await this.createOrUpdate({ ...task, done, repeat: Repeat.No });
+    } else {
+      await this.createOrUpdate({ ...task, done });
+    }
+  }
+
+  private async createNextReocurance(task: Task) {
+    if (task.repeat !== Repeat.No) {
+      return await this.createOrUpdate({
         ...task,
         _id: new BSON.ObjectId(),
         done: false,
@@ -41,45 +70,11 @@ class TasksService {
             ? getNextDailyOccurence(task.date)
             : getNextMonthlyOccurence(task.date),
       });
-      this.createOrUpdate({
-        ...task,
-        next: newTask._id,
-      });
-    }
-  }
-
-  delete(task: Task) {
-    const id = task._id.toString(); // grab id before deletion to avoid error
-    tasksRepository.delete(task);
-    notificationsService.cancelNotification(id);
-  }
-
-  changeState(task: Task, done = true) {
-    tasksRepository.changeState(task, done);
-    if (done) {
-      notificationsService.cancelNotification(task._id.toString());
-      this.createNextReocurance(task);
-    } else {
-      this.scheduleTaskNotification(task);
-    }
-  }
-
-  private scheduleTaskNotification(task: ITask) {
-    notificationsService.scheduleNotification(
-      this.createNotification(task),
-      task.date,
-    );
-  }
-
-  changeStateById(id: string, done = true) {
-    const task = tasksRepository.get(id);
-    if (task) {
-      this.changeState(task, done);
     }
   }
 
   listenBackgroundEvents() {
-    notificationsService.onBackgroundEvent(this.onNotificationEvent);
+    return notificationsService.onBackgroundEvent(this.onNotificationEvent);
   }
 
   listenForegroundEvents() {
@@ -87,12 +82,11 @@ class TasksService {
   }
 
   private async onNotificationEvent({ type, detail }: Event) {
-    detail.channel;
     switch (type) {
       case EventType.DISMISSED:
         console.log("User dismissed notification");
         if (detail.notification?.android?.ongoing) {
-          notificationsService.displayNotification(detail.notification);
+          await notificationsService.displayNotification(detail.notification);
         }
         break;
       case EventType.PRESS:

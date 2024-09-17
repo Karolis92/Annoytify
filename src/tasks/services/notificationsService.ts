@@ -7,19 +7,19 @@ import { NotificationChannels } from "../../common/enums/NotificationChannels";
 
 class NotificationsService {
   constructor() {
-    this.setupNotificationChannels();
-    notifee.requestPermission();
+    this.setup();
   }
 
-  private setupNotificationChannels() {
-    notifee.createChannel({
+  private async setup() {
+    await notifee.createChannel({
       id: NotificationChannels.Reminders,
       name: "Reminders",
     });
+    await notifee.requestPermission();
   }
 
   displayNotification(notification: Notification) {
-    notifee.displayNotification(notification);
+    return notifee.displayNotification(notification);
   }
 
   scheduleNotification(notification: Notification, time: Date) {
@@ -30,7 +30,7 @@ class NotificationsService {
   }
 
   cancelNotification(id: string) {
-    notifee.cancelNotification(id);
+    return notifee.cancelNotification(id);
   }
 
   onBackgroundEvent(observer: (event: Event) => Promise<void>) {

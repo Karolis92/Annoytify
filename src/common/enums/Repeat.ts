@@ -1,5 +1,5 @@
 export enum Repeat {
-  Once = "ONCE",
+  No = "NO",
   Daily = "DAILY",
   Monthly = "MONTHLY",
 }
