@@ -23,7 +23,11 @@ const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
     >
       <Card.Header p="$3">
         <XStack gap="$2">
-          <Checkbox mt="$1" onCheckedChange={onDoneChange} checked={task.done}>
+          <Checkbox
+            size="$5"
+            onCheckedChange={onDoneChange}
+            checked={task.done}
+          >
             <Checkbox.Indicator>
               <Check />
             </Checkbox.Indicator>
