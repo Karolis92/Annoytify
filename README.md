@@ -26,3 +26,24 @@ App can also be built locally with Android Studio and used with emulator (`start
 `build:dev` - build dev client app using EAS
 
 `build:preview` - build preview app (apk) using EAS
+
+## Realm replacements (local-only)
+
+If you want to move away from Realm for this app's use case (Android-only, local-only todo storage, simple filtering/updates), these are the best options:
+
+1. **Expo SQLite + Drizzle ORM (recommended)**
+   - Best fit for Expo/React Native apps that need reliable local relational storage.
+   - Strong typing, migrations, and straightforward queries for task lists (`date`, `done`, `repeat`).
+   - No vendor lock-in to a sync platform.
+
+2. **WatermelonDB**
+   - Great when you need very large datasets and highly reactive list rendering.
+   - More setup/complexity than needed for this app today.
+
+3. **react-native-mmkv (+ optional wrapper)**
+   - Fast key-value storage, good for settings/small state.
+   - Not ideal as a primary store for query-heavy task data.
+
+### Suggested direction for Annoytify
+
+For the current feature set, **Expo SQLite + Drizzle ORM** is the most balanced replacement: simple, local-first, predictable, and well-suited for task CRUD + date/status filtering.
