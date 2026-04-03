@@ -14,7 +14,9 @@ const useLiveQuery = <TData>(
       setData(await query());
       setError(undefined);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Live query failed."));
+      const errMsg =
+        err instanceof Error ? err.message : "unknown error while querying";
+      setError(new Error(`Failed to execute live query: ${errMsg}`));
     } finally {
       setIsLoading(false);
     }
