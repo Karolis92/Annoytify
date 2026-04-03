@@ -49,7 +49,11 @@ class TasksRepository {
         .all()
     ).at(0);
 
-    return savedTask ?? this.get(task._id);
+    if (!savedTask) {
+      throw new Error("Failed to upsert task.");
+    }
+
+    return savedTask;
   }
 
   async delete(id: string) {

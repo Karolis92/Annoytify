@@ -22,10 +22,16 @@ const repeatType = customType<{ data: Repeat; driverData: string }>({
   dataType() {
     return "text";
   },
+  toDriver(value) {
+    return value;
+  },
+  fromDriver(value) {
+    return value as Repeat;
+  },
 });
 
 export const tasks = sqliteTable("tasks", {
-  _id: text("id").primaryKey(),
+  _id: text("_id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   date: isoDate("date").notNull(),

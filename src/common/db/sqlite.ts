@@ -43,13 +43,13 @@ export const initDb = async () => {
       .execAsync(
         [
           {
-            sql: `CREATE TABLE IF NOT EXISTS tasks (
-              id TEXT PRIMARY KEY NOT NULL,
-              title TEXT NOT NULL,
-              description TEXT NOT NULL,
-              date TEXT NOT NULL,
-              repeat TEXT NOT NULL,
-              done INTEGER NOT NULL DEFAULT 0
+            sql: `CREATE TABLE IF NOT EXISTS ${tasks._.name} (
+              ${tasks._id.name} TEXT PRIMARY KEY NOT NULL,
+              ${tasks.title.name} TEXT NOT NULL,
+              ${tasks.description.name} TEXT NOT NULL,
+              ${tasks.date.name} TEXT NOT NULL,
+              ${tasks.repeat.name} TEXT NOT NULL,
+              ${tasks.done.name} INTEGER NOT NULL DEFAULT 0
             )`,
             args: [],
           },

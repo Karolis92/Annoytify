@@ -40,23 +40,21 @@ const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
 
   useEffect(() => {
     let mounted = true;
-    const loadTask = async () => {
-      if (!taskId) {
-        setExistingTask(undefined);
-        setFormState(createDefaultState());
-        return;
-      }
-      const task = await tasksRepository.get(taskId);
+    const safeSetTaskState = (task: ITask | undefined) => {
       if (!mounted) {
         return;
       }
-      if (task) {
-        setExistingTask(task);
-        setFormState(task);
-      } else {
-        setExistingTask(undefined);
-        setFormState(createDefaultState());
+      setExistingTask(task);
+      setFormState(task ?? createDefaultState());
+    };
+
+    const loadTask = async () => {
+      if (!taskId) {
+        safeSetTaskState(undefined);
+        return;
       }
+      const task = await tasksRepository.get(taskId);
+      safeSetTaskState(task);
     };
 
     loadTask();
