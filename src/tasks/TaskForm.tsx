@@ -35,14 +35,12 @@ const createDefaultState = (): ITask => ({
 
 const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
   const [titleError, setTitleError] = useState<string>();
-  const { tasks, error } = useLiveTasks();
+  const { tasks, error, isLoading } = useLiveTasks();
   const existingTask = useMemo(
     () => tasks.find((task) => task.id === taskId),
     [taskId, tasks],
   );
-  const [formState, setFormState] = useState<ITask>(
-    () => existingTask ?? createDefaultState(),
-  );
+  const [formState, setFormState] = useState<ITask>(createDefaultState);
 
   useEffect(() => {
     if (existingTask) {
@@ -50,13 +48,21 @@ const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
     } else {
       setFormState(createDefaultState());
     }
-  }, [existingTask]);
+  }, [existingTask, taskId]);
 
   useEffect(() => {
     if (error) {
       ToastAndroid.show("Failed to load task.", ToastAndroid.SHORT);
     }
   }, [error]);
+
+  if (taskId && isLoading) {
+    return (
+      <View p="$3">
+        <Text>Loading task...</Text>
+      </View>
+    );
+  }
 
   const changeHandler =
     (field: keyof ITask) =>

@@ -65,7 +65,7 @@ export const initDb = async () => {
       const latestMigration = await tx.executeSqlAsync(
         `SELECT MAX(version) as version FROM "__app_migrations"`,
       );
-      const currentVersion = Number(latestMigration.rows[0]?.version ?? 0);
+      const currentVersion = Number(latestMigration.rows?.[0]?.version ?? 0);
 
       for (const migration of migrations) {
         if (migration.version <= currentVersion) {
