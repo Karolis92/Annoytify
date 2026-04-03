@@ -50,7 +50,7 @@ class TasksRepository {
     ).at(0);
 
     if (!savedTask) {
-      throw new Error("Failed to upsert task.");
+      throw new Error(`Failed to upsert task with id ${task._id}.`);
     }
 
     return savedTask;

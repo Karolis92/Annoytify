@@ -11,8 +11,16 @@ export interface ITask {
 
 export type Task = ITask;
 
-export const createTaskId = () =>
-  globalThis.crypto?.randomUUID?.() ??
+const createFallbackTaskId = () =>
   `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random()
     .toString(16)
     .slice(2)}`;
+
+export const createTaskId = () => {
+  const randomUuid = globalThis.crypto?.randomUUID;
+  if (randomUuid) {
+    return randomUuid();
+  }
+
+  return createFallbackTaskId();
+};

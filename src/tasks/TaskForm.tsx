@@ -53,8 +53,15 @@ const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
         safeSetTaskState(undefined);
         return;
       }
-      const task = await tasksRepository.get(taskId);
-      safeSetTaskState(task);
+      try {
+        const task = await tasksRepository.get(taskId);
+        safeSetTaskState(task);
+      } catch {
+        safeSetTaskState(undefined);
+        if (mounted) {
+          ToastAndroid.show("Failed to load task.", ToastAndroid.SHORT);
+        }
+      }
     };
 
     loadTask();
