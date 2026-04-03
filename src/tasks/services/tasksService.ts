@@ -1,5 +1,4 @@
 import { Event, EventType, Notification } from "@notifee/react-native";
-import { BSON } from "realm";
 import { registerOnBootTask } from "../../../modules/on-boot";
 import { NotificationChannels } from "../../common/enums/NotificationChannels";
 import { PressAction } from "../../common/enums/PressAction";
@@ -8,7 +7,7 @@ import {
   getNextDailyOccurence,
   getNextMonthlyOccurence,
 } from "../../common/utils/dateUtils";
-import { ITask, Task } from "../db/models";
+import { createTaskId, ITask } from "../db/models";
 import tasksRepository from "../db/tasksRepository";
 import notificationsService from "../services/notificationsService";
 
@@ -16,7 +15,7 @@ class TasksService {
   constructor() {
     // show ongoing task notifications after reboot
     registerOnBootTask(async () => {
-      const ongoingTasks = tasksRepository.getOngoing();
+      const ongoingTasks = await tasksRepository.getOngoing();
       ongoingTasks.forEach((task) =>
         notificationsService.displayNotification(this.createNotification(task)),
       );
@@ -24,33 +23,36 @@ class TasksService {
   }
 
   async createOrUpdate(task: ITask) {
-    const newTask = tasksRepository.upsert(task);
+    const newTask = await tasksRepository.upsert(task);
+    if (!newTask) {
+      return;
+    }
     // remove notification if already shown
-    await notificationsService.cancelNotification(newTask._id.toString());
+    await notificationsService.cancelNotification(newTask._id);
     // schedule new notification
     if (!newTask.done) {
       await notificationsService.scheduleNotification(
-        this.createNotification(task),
-        task.date,
+        this.createNotification(newTask),
+        newTask.date,
       );
     }
     return newTask;
   }
 
-  async delete(task: Task) {
-    const id = task._id.toString(); // grab id before deletion to avoid error
-    tasksRepository.delete(task);
+  async delete(task: ITask) {
+    const id = task._id;
+    await tasksRepository.delete(id);
     await notificationsService.cancelNotification(id);
   }
 
   async changeStateById(id: string, done = true) {
-    const task = tasksRepository.get(id);
+    const task = await tasksRepository.get(id);
     if (task) {
       await this.changeState(task, done);
     }
   }
 
-  async changeState(task: Task, done = true) {
+  async changeState(task: ITask, done = true) {
     if (done) {
       await this.createNextReocurance(task);
       await this.createOrUpdate({ ...task, done, repeat: Repeat.No });
@@ -59,11 +61,11 @@ class TasksService {
     }
   }
 
-  private async createNextReocurance(task: Task) {
+  private async createNextReocurance(task: ITask) {
     if (task.repeat !== Repeat.No) {
       return await this.createOrUpdate({
         ...task,
-        _id: new BSON.ObjectId(),
+        _id: createTaskId(),
         done: false,
         date:
           task.repeat === Repeat.Daily
@@ -106,7 +108,7 @@ class TasksService {
 
   private createNotification(task: ITask): Notification {
     return {
-      id: task._id.toString(),
+      id: task._id,
       title: task.title,
       body: task.description,
       android: {

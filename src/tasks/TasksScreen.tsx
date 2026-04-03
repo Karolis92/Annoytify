@@ -1,21 +1,31 @@
-import { useQuery } from "@realm/react";
 import { Plus } from "@tamagui/lucide-icons";
-import { useState } from "react";
-import { BSON } from "realm";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useState } from "react";
 import { Button, ScrollView, View } from "tamagui";
 import Sheet from "../common/components/Sheet";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
 import { Task } from "./db/models";
+import tasksRepository from "./db/tasksRepository";
 
 interface SheetState {
   open: boolean;
-  taskId?: BSON.ObjectId;
+  taskId?: string;
 }
 
 const TasksScreen = () => {
-  const tasks = useQuery(Task);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [sheetState, setSheetState] = useState<SheetState>({ open: false });
+
+  const refreshTasks = useCallback(async () => {
+    setTasks(await tasksRepository.getAll());
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshTasks();
+    }, [refreshTasks]),
+  );
 
   return (
     <View padding="$3" flex={1}>
@@ -23,9 +33,10 @@ const TasksScreen = () => {
         <View mb="$12" gap="$4">
           {tasks.map((task) => (
             <TaskCard
-              key={task._id.toString()}
+              key={task._id}
               task={task}
               onPress={() => setSheetState({ open: true, taskId: task._id })}
+              onDoneChanged={refreshTasks}
             />
           ))}
         </View>
@@ -50,6 +61,7 @@ const TasksScreen = () => {
         <TaskForm
           taskId={sheetState.taskId}
           onClose={() => setSheetState({ open: false })}
+          onSaved={refreshTasks}
         />
       </Sheet>
     </View>

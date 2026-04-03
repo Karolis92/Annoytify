@@ -1,8 +1,7 @@
-import Realm, { BSON, ObjectSchema } from "realm";
 import { Repeat } from "../../common/enums/Repeat";
 
 export interface ITask {
-  _id: BSON.ObjectId;
+  _id: string;
   title: string;
   description: string;
   date: Date;
@@ -10,26 +9,9 @@ export interface ITask {
   done: boolean;
 }
 
-export class Task extends Realm.Object<Task> implements ITask {
-  _id!: BSON.ObjectId;
-  title!: string;
-  description!: string;
-  date!: Date;
-  repeat!: Repeat;
-  done!: boolean;
+export type Task = ITask;
 
-  static schema: ObjectSchema = {
-    name: "Task",
-    properties: {
-      _id: "objectId",
-      title: { type: "string", indexed: "full-text" },
-      description: { type: "string", indexed: "full-text" },
-      date: "date",
-      repeat: "string",
-      done: "bool",
-    },
-    primaryKey: "_id",
-  };
-}
-
-export const TasksModels = [Task];
+export const createTaskId = () =>
+  `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random()
+    .toString(16)
+    .slice(2)}`;

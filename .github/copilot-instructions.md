@@ -8,17 +8,17 @@ The app **cannot** run on Expo Go because it uses native modules. Use an EAS dev
 
 ## Tech Stack
 
-| Layer | Library |
-|---|---|
-| Framework | React Native 0.72 / Expo 49 |
-| Language | TypeScript (strict mode + `noUncheckedIndexedAccess`) |
-| UI components | Tamagui v1 |
-| Icons | `@tamagui/lucide-icons` |
-| Navigation | React Navigation v6 (native stack) |
-| Local database | Realm / `@realm/react` |
-| Notifications | `@notifee/react-native` |
-| Date utilities | `date-fns` v4 |
-| Formatting | Prettier (config in `.prettierrc`) |
+| Layer          | Library                                               |
+| -------------- | ----------------------------------------------------- |
+| Framework      | React Native 0.72 / Expo 49                           |
+| Language       | TypeScript (strict mode + `noUncheckedIndexedAccess`) |
+| UI components  | Tamagui v1                                            |
+| Icons          | `@tamagui/lucide-icons`                               |
+| Navigation     | React Navigation v6 (native stack)                    |
+| Local database | Expo SQLite + Drizzle ORM                             |
+| Notifications  | `@notifee/react-native`                               |
+| Date utilities | `date-fns` v4                                         |
+| Formatting     | Prettier (config in `.prettierrc`)                    |
 
 ## Repository Structure
 
@@ -26,13 +26,13 @@ The app **cannot** run on Expo Go because it uses native modules. Use an EAS dev
 src/
   common/
     components/   # Shared UI components (DateSelect, Select, Sheet)
-    db/           # Realm configuration and AppRealmProvider
+    db/           # SQLite database setup and schema
     enums/        # Shared enums (Repeat, PressAction, NotificationChannels)
     utils/        # Utility functions (dateUtils)
   navigation/     # RootNavigator and param list types
   settings/       # Settings screen
   tasks/
-    db/           # Task Realm model and repository
+    db/           # Task types and repository
     services/     # TasksService and NotificationsService
     TaskCard.tsx
     TaskForm.tsx
@@ -48,8 +48,7 @@ app.config.js     # Expo config (reads APP_VARIANT env var)
 
 - **Feature-based folder structure**: code is grouped under `src/tasks/`, `src/settings/`, etc.
 - **Singleton services**: `tasksService` and `notificationsService` are exported as singleton instances of their respective classes.
-- **Repository pattern**: `tasksRepository` wraps all Realm write/query operations for the `Task` model.
-- **Realm models**: extend `Realm.Object` and implement a matching `ITask` interface; always define a static `schema` property.
+- **Repository pattern**: `tasksRepository` wraps all SQLite/Drizzle read/write operations for tasks.
 - **Navigation**: typed with `RootNavigatorParamList`; use `createNativeStackNavigator<RootNavigatorParamList>()`.
 - **Theming**: use Tamagui `useTheme()` hook for colours; never hard-code colour values.
 
@@ -79,5 +78,5 @@ npm run format                # Run Prettier on the whole project
 - **Android only**: Android is the only supported/released platform. `app.config.js` may still contain `ios` and `web` configuration blocks for Expo tooling compatibility, but those targets are not maintained and should not be treated as active targets; do not add iOS- or web-specific code.
 - The app must survive process death and device reboots – notification restoration on boot is handled by `registerOnBootTask` in `modules/on-boot`.
 - Notifications are created as `ongoing: true` and `autoCancel: false` so they persist even after the user swipes them away.
-- `Task._id` is a `BSON.ObjectId`; always call `.toString()` before passing it to notification APIs.
+- `Task._id` is a string identifier and is used directly as notification id.
 - When creating a recurring task that is marked done, a new `Task` document with a fresh `_id` is inserted for the next occurrence; the original task's `repeat` field is set to `Repeat.No`.

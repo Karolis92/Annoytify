@@ -6,11 +6,13 @@ import tasksService from "./services/tasksService";
 
 interface TaskCardProps extends CardProps {
   task: Task;
+  onDoneChanged: () => void;
 }
 
-const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
-  const onDoneChange = (done: boolean) => {
-    tasksService.changeState(task, done);
+const TaskCard = ({ task, onDoneChanged, ...cardProps }: TaskCardProps) => {
+  const onDoneChange = async (done: boolean) => {
+    await tasksService.changeState(task, done);
+    onDoneChanged();
   };
 
   const textDecorationLine = task.done ? "line-through" : undefined;
