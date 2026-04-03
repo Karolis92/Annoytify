@@ -8,17 +8,17 @@ The app **cannot** run on Expo Go because it uses native modules. Use an EAS dev
 
 ## Tech Stack
 
-| Layer | Library |
-|---|---|
-| Framework | React Native 0.72 / Expo 49 |
-| Language | TypeScript (strict mode + `noUncheckedIndexedAccess`) |
-| UI components | Tamagui v1 |
-| Icons | `@tamagui/lucide-icons` |
-| Navigation | React Navigation v6 (native stack) |
-| Local database | Realm / `@realm/react` |
-| Notifications | `@notifee/react-native` |
-| Date utilities | `date-fns` v4 |
-| Formatting | Prettier (config in `.prettierrc`) |
+| Layer          | Library                                               |
+| -------------- | ----------------------------------------------------- |
+| Framework      | React Native 0.72 / Expo 49                           |
+| Language       | TypeScript (strict mode + `noUncheckedIndexedAccess`) |
+| UI components  | Tamagui v1                                            |
+| Icons          | `@tamagui/lucide-icons`                               |
+| Navigation     | React Navigation v6 (native stack)                    |
+| Local database | Realm / `@realm/react`                                |
+| Notifications  | `@notifee/react-native`                               |
+| Date utilities | `date-fns` v4                                         |
+| Formatting     | Prettier (config in `.prettierrc`)                    |
 
 ## Repository Structure
 
