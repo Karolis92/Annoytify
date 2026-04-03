@@ -9,7 +9,7 @@ const useLiveTasks = () => {
   return {
     tasks: liveQuery.data ?? [],
     error: liveQuery.error,
-    refresh: async () => {
+    refresh: () => {
       setRefreshKey((value) => value + 1);
     },
     isLoading: liveQuery.updatedAt == null && !liveQuery.error,
