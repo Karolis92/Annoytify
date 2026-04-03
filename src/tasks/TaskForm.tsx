@@ -58,7 +58,11 @@ const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
 
   if (taskId && isLoading) {
     return (
-      <View p="$3">
+      <View
+        p="$3"
+        accessibilityLabel="Loading task"
+        accessibilityRole="progressbar"
+      >
         <Text>Loading task...</Text>
       </View>
     );

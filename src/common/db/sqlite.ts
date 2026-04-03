@@ -20,6 +20,14 @@ const migrations = [
   },
 ];
 
+const parseMigrationVersion = (versionRaw: unknown) => {
+  const parsedVersion =
+    typeof versionRaw === "number"
+      ? versionRaw
+      : Number.parseInt(String(versionRaw ?? "0"), 10);
+  return Number.isNaN(parsedVersion) ? 0 : parsedVersion;
+};
+
 const db = drizzle(
   async (query, params, method) => {
     const isReadOnly =
@@ -65,12 +73,9 @@ export const initDb = async () => {
       const latestMigration = await tx.executeSqlAsync(
         `SELECT MAX(version) as version FROM "__app_migrations"`,
       );
-      const versionRaw = latestMigration.rows?.[0]?.version;
-      const parsedVersion =
-        typeof versionRaw === "number"
-          ? versionRaw
-          : Number.parseInt(String(versionRaw ?? "0"), 10);
-      const currentVersion = Number.isNaN(parsedVersion) ? 0 : parsedVersion;
+      const currentVersion = parseMigrationVersion(
+        latestMigration.rows?.[0]?.version,
+      );
 
       for (const migration of migrations) {
         if (migration.version <= currentVersion) {
