@@ -76,7 +76,7 @@ npm run format                # Run Prettier on the whole project
 
 ## Important Notes
 
-- **Android only**: there is no iOS or web target; do not add iOS-specific code.
+- **Android only**: Android is the only supported/released platform. `app.config.js` may still contain `ios` and `web` configuration blocks for Expo tooling compatibility, but those targets are not maintained and should not be treated as active targets; do not add iOS- or web-specific code.
 - The app must survive process death and device reboots – notification restoration on boot is handled by `registerOnBootTask` in `modules/on-boot`.
 - Notifications are created as `ongoing: true` and `autoCancel: false` so they persist even after the user swipes them away.
 - `Task._id` is a `BSON.ObjectId`; always call `.toString()` before passing it to notification APIs.
