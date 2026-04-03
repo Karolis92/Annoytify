@@ -4,17 +4,8 @@ import { tasks } from "../../common/db/sqliteSchema";
 import { ITask } from "./models";
 
 class TasksRepository {
-  private listeners = new Set<() => void>();
-
-  subscribe(listener: () => void) {
-    this.listeners.add(listener);
-    return () => {
-      this.listeners.delete(listener);
-    };
-  }
-
-  private notify() {
-    this.listeners.forEach((listener) => listener());
+  getAllQuery() {
+    return db.select().from(tasks).orderBy(asc(tasks.date));
   }
 
   async get(id: string) {
@@ -28,7 +19,7 @@ class TasksRepository {
   }
 
   async getAll() {
-    return await db.select().from(tasks).orderBy(asc(tasks.date)).all();
+    return await this.getAllQuery().all();
   }
 
   async getOngoing() {
@@ -62,24 +53,15 @@ class TasksRepository {
       throw new Error(`Failed to upsert task with id ${task.id}.`);
     }
 
-    this.notify();
     return savedTask;
   }
 
   async delete(id: string) {
-    const result = await db.delete(tasks).where(eq(tasks.id, id)).run();
-    this.notify();
-    return result;
+    return await db.delete(tasks).where(eq(tasks.id, id)).run();
   }
 
   async changeState(id: string, done = true) {
-    const result = await db
-      .update(tasks)
-      .set({ done })
-      .where(eq(tasks.id, id))
-      .run();
-    this.notify();
-    return result;
+    return await db.update(tasks).set({ done }).where(eq(tasks.id, id)).run();
   }
 }
 

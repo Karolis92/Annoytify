@@ -8,6 +8,7 @@
     "build": "eas build --platform android",
     "build:dev": "npm run build -- --profile development",
     "build:preview": "npm run build -- --profile preview",
+    "db:generate": "drizzle-kit generate",
     "format": "prettier . --write"
   },
   "dependencies": {
@@ -17,11 +18,11 @@
     "@tamagui/config": "^1.90.6",
     "@tamagui/lucide-icons": "^1.90.6",
     "date-fns": "^4.0.0-beta.1",
-    "drizzle-orm": "^0.27.2",
+    "drizzle-orm": "^0.36.0",
     "expo": "~49.0.15",
     "expo-dev-client": "~2.4.12",
     "expo-splash-screen": "~0.20.5",
-    "expo-sqlite": "~11.3.3",
+    "expo-sqlite": "~13.2.0",
     "expo-status-bar": "~1.6.0",
     "react": "18.2.0",
     "react-native": "0.72.6",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.14",
+    "drizzle-kit": "^0.31.10",
     "expo-build-properties": "^0.11.0",
     "prettier": "^3.3.3",
     "typescript": "^5.1.3"

@@ -1,22 +1,20 @@
-import { useCallback } from "react";
+import { useMemo, useState } from "react";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { Task } from "./db/models";
 import tasksRepository from "./db/tasksRepository";
-import { useLiveQuery } from "./useLiveQuery";
 
 const useLiveTasks = () => {
-  const query = useCallback(() => tasksRepository.getAll(), []);
-  const subscribe = useCallback(
-    (listener: () => void) => tasksRepository.subscribe(listener),
-    [],
-  );
-
-  const liveQuery = useLiveQuery<Task[]>(query, subscribe);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const query = useMemo(() => tasksRepository.getAllQuery(), [refreshKey]);
+  const liveQuery = useLiveQuery(query, [refreshKey]);
 
   return {
-    tasks: liveQuery.data ?? [],
+    tasks: (liveQuery.data as Task[] | undefined) ?? [],
     error: liveQuery.error,
-    refresh: liveQuery.refresh,
-    isLoading: liveQuery.isLoading,
+    refresh: async () => {
+      setRefreshKey((value) => value + 1);
+    },
+    isLoading: !liveQuery.updatedAt && !liveQuery.error,
   };
 };
 
