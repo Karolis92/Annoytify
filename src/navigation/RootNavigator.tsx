@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft, Settings2 } from "@tamagui/lucide-icons";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -19,7 +19,7 @@ const RootNavigator = () => {
     >
       <NavigationContainer
         theme={{
-          dark: true,
+          ...DarkTheme,
           colors: {
             background: theme.background.get(),
             border: theme.borderColor.get(),

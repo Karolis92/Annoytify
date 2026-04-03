@@ -10,7 +10,7 @@ The app **cannot** run on Expo Go because it uses native modules. Use an EAS dev
 
 | Layer          | Library                                               |
 | -------------- | ----------------------------------------------------- |
-| Framework      | React Native 0.76 / Expo 52                           |
+| Framework      | React Native 0.83 / Expo 55                           |
 | Language       | TypeScript (strict mode + `noUncheckedIndexedAccess`) |
 | UI components  | Tamagui v1                                            |
 | Icons          | `@tamagui/lucide-icons`                               |
