@@ -1,6 +1,7 @@
 import { Plus } from "@tamagui/lucide-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
+import { ToastAndroid } from "react-native";
 import { Button, ScrollView, View } from "tamagui";
 import Sheet from "../common/components/Sheet";
 import TaskCard from "./TaskCard";
@@ -18,7 +19,11 @@ const TasksScreen = () => {
   const [sheetState, setSheetState] = useState<SheetState>({ open: false });
 
   const refreshTasks = useCallback(async () => {
-    setTasks(await tasksRepository.getAll());
+    try {
+      setTasks(await tasksRepository.getAll());
+    } catch {
+      ToastAndroid.show("Failed to load tasks.", ToastAndroid.SHORT);
+    }
   }, []);
 
   useFocusEffect(

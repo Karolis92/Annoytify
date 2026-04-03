@@ -17,9 +17,9 @@ const createFallbackTaskId = () =>
     .slice(2)}`;
 
 export const createTaskId = () => {
-  const randomUuid = globalThis.crypto?.randomUUID;
-  if (randomUuid) {
-    return randomUuid();
+  const randomUuidFn = globalThis.crypto?.randomUUID;
+  if (randomUuidFn) {
+    return randomUuidFn();
   }
 
   return createFallbackTaskId();

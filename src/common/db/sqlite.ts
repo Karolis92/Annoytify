@@ -20,13 +20,13 @@ const db = drizzle(
     }
 
     const arrayRows = first.rows.map((row) => Object.values(row));
-    const firstRow = arrayRows.at(0) ?? [];
+    const fallbackRow = arrayRows.at(0) ?? [];
 
     switch (method) {
       case "run":
         return { rows: [] };
       case "get":
-        return { rows: firstRow };
+        return { rows: fallbackRow };
       case "all":
       case "values":
         return { rows: arrayRows };
