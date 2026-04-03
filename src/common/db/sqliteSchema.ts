@@ -31,7 +31,7 @@ const repeatType = customType<{ data: Repeat; driverData: string }>({
 });
 
 export const tasks = sqliteTable("tasks", {
-  _id: text("_id").primaryKey(),
+  id: text("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   date: isoDate("date").notNull(),

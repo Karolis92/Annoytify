@@ -1,5 +1,5 @@
 import { Save, Trash2, X } from "@tamagui/lucide-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ToastAndroid } from "react-native";
 import {
   Button,
@@ -15,8 +15,8 @@ import DateSelect from "../common/components/DateSelect";
 import Select from "../common/components/Select";
 import { Repeat } from "../common/enums/Repeat";
 import { createTaskId, ITask } from "./db/models";
-import tasksRepository from "./db/tasksRepository";
 import tasksService from "./services/tasksService";
+import { useLiveTasks } from "./useLiveTasks";
 
 interface TaskFormProps {
   taskId?: string;
@@ -25,7 +25,7 @@ interface TaskFormProps {
 }
 
 const createDefaultState = (): ITask => ({
-  _id: createTaskId(),
+  id: createTaskId(),
   title: "",
   description: "",
   date: new Date(),
@@ -35,41 +35,28 @@ const createDefaultState = (): ITask => ({
 
 const TaskForm = ({ taskId, onClose, onSaved }: TaskFormProps) => {
   const [titleError, setTitleError] = useState<string>();
-  const [existingTask, setExistingTask] = useState<ITask>();
-  const [formState, setFormState] = useState<ITask>(createDefaultState);
+  const { tasks, error } = useLiveTasks();
+  const existingTask = useMemo(
+    () => tasks.find((task) => task.id === taskId),
+    [taskId, tasks],
+  );
+  const [formState, setFormState] = useState<ITask>(
+    () => existingTask ?? createDefaultState(),
+  );
 
   useEffect(() => {
-    let mounted = true;
-    const safeSetTaskState = (task: ITask | undefined) => {
-      if (!mounted) {
-        return;
-      }
-      setExistingTask(task);
-      setFormState(task ?? createDefaultState());
-    };
+    if (existingTask) {
+      setFormState(existingTask);
+    } else {
+      setFormState(createDefaultState());
+    }
+  }, [existingTask]);
 
-    const loadTask = async () => {
-      if (!taskId) {
-        safeSetTaskState(undefined);
-        return;
-      }
-      try {
-        const task = await tasksRepository.get(taskId);
-        safeSetTaskState(task);
-      } catch {
-        safeSetTaskState(undefined);
-        if (mounted) {
-          ToastAndroid.show("Failed to load task.", ToastAndroid.SHORT);
-        }
-      }
-    };
-
-    loadTask();
-
-    return () => {
-      mounted = false;
-    };
-  }, [taskId]);
+  useEffect(() => {
+    if (error) {
+      ToastAndroid.show("Failed to load task.", ToastAndroid.SHORT);
+    }
+  }, [error]);
 
   const changeHandler =
     (field: keyof ITask) =>

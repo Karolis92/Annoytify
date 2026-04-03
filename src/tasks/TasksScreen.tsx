@@ -1,13 +1,11 @@
 import { Plus } from "@tamagui/lucide-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastAndroid } from "react-native";
 import { Button, ScrollView, View } from "tamagui";
 import Sheet from "../common/components/Sheet";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
-import { Task } from "./db/models";
-import tasksRepository from "./db/tasksRepository";
+import { useLiveTasks } from "./useLiveTasks";
 
 interface SheetState {
   open: boolean;
@@ -15,22 +13,14 @@ interface SheetState {
 }
 
 const TasksScreen = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, error, refresh } = useLiveTasks();
   const [sheetState, setSheetState] = useState<SheetState>({ open: false });
 
-  const refreshTasks = useCallback(async () => {
-    try {
-      setTasks(await tasksRepository.getAll());
-    } catch {
+  useEffect(() => {
+    if (error) {
       ToastAndroid.show("Failed to load tasks.", ToastAndroid.SHORT);
     }
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      refreshTasks();
-    }, [refreshTasks]),
-  );
+  }, [error]);
 
   return (
     <View padding="$3" flex={1}>
@@ -38,10 +28,10 @@ const TasksScreen = () => {
         <View mb="$12" gap="$4">
           {tasks.map((task) => (
             <TaskCard
-              key={task._id}
+              key={task.id}
               task={task}
-              onPress={() => setSheetState({ open: true, taskId: task._id })}
-              onDoneChanged={refreshTasks}
+              onPress={() => setSheetState({ open: true, taskId: task.id })}
+              onDoneChanged={refresh}
             />
           ))}
         </View>
@@ -66,7 +56,7 @@ const TasksScreen = () => {
         <TaskForm
           taskId={sheetState.taskId}
           onClose={() => setSheetState({ open: false })}
-          onSaved={refreshTasks}
+          onSaved={refresh}
         />
       </Sheet>
     </View>

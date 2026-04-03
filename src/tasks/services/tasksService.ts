@@ -28,7 +28,7 @@ class TasksService {
       return;
     }
     // remove notification if already shown
-    await notificationsService.cancelNotification(newTask._id);
+    await notificationsService.cancelNotification(newTask.id);
     // schedule new notification
     if (!newTask.done) {
       await notificationsService.scheduleNotification(
@@ -40,7 +40,7 @@ class TasksService {
   }
 
   async delete(task: ITask) {
-    const id = task._id;
+    const id = task.id;
     await tasksRepository.delete(id);
     await notificationsService.cancelNotification(id);
   }
@@ -65,7 +65,7 @@ class TasksService {
     if (task.repeat !== Repeat.No) {
       return await this.createOrUpdate({
         ...task,
-        _id: createTaskId(),
+        id: createTaskId(),
         done: false,
         date:
           task.repeat === Repeat.Daily
@@ -108,7 +108,7 @@ class TasksService {
 
   private createNotification(task: ITask): Notification {
     return {
-      id: task._id,
+      id: task.id,
       title: task.title,
       body: task.description,
       android: {

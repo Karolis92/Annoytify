@@ -1,15 +1,8 @@
-import { Repeat } from "../../common/enums/Repeat";
+import { InferModel } from "drizzle-orm";
+import { tasks } from "../../common/db/sqliteSchema";
 
-export interface ITask {
-  _id: string;
-  title: string;
-  description: string;
-  date: Date;
-  repeat: Repeat;
-  done: boolean;
-}
-
-export type Task = ITask;
+export type Task = InferModel<typeof tasks>;
+export type ITask = Task;
 
 const createFallbackTaskId = () =>
   `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random()

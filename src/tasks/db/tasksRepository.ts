@@ -1,27 +1,37 @@
 import { and, asc, eq, lte, ne } from "drizzle-orm";
-import db, { initDb } from "../../common/db/sqlite";
+import db from "../../common/db/sqlite";
 import { tasks } from "../../common/db/sqliteSchema";
 import { ITask } from "./models";
 
 class TasksRepository {
+  private listeners = new Set<() => void>();
+
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  private notify() {
+    this.listeners.forEach((listener) => listener());
+  }
+
   async get(id: string) {
-    await initDb();
     const rows = await db
       .select()
       .from(tasks)
-      .where(eq(tasks._id, id))
+      .where(eq(tasks.id, id))
       .limit(1)
       .all();
     return rows.at(0);
   }
 
   async getAll() {
-    await initDb();
     return await db.select().from(tasks).orderBy(asc(tasks.date)).all();
   }
 
   async getOngoing() {
-    await initDb();
     return await db
       .select()
       .from(tasks)
@@ -30,13 +40,12 @@ class TasksRepository {
   }
 
   async upsert(task: ITask) {
-    await initDb();
     const savedTask = (
       await db
         .insert(tasks)
         .values(task)
         .onConflictDoUpdate({
-          target: tasks._id,
+          target: tasks.id,
           set: {
             title: task.title,
             description: task.description,
@@ -50,20 +59,27 @@ class TasksRepository {
     ).at(0);
 
     if (!savedTask) {
-      throw new Error(`Failed to upsert task with id ${task._id}.`);
+      throw new Error(`Failed to upsert task with id ${task.id}.`);
     }
 
+    this.notify();
     return savedTask;
   }
 
   async delete(id: string) {
-    await initDb();
-    return await db.delete(tasks).where(eq(tasks._id, id)).run();
+    const result = await db.delete(tasks).where(eq(tasks.id, id)).run();
+    this.notify();
+    return result;
   }
 
   async changeState(id: string, done = true) {
-    await initDb();
-    return await db.update(tasks).set({ done }).where(eq(tasks._id, id)).run();
+    const result = await db
+      .update(tasks)
+      .set({ done })
+      .where(eq(tasks.id, id))
+      .run();
+    this.notify();
+    return result;
   }
 }
 
