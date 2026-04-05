@@ -1,4 +1,4 @@
-import { Check, CheckSquare, ChevronDown, X } from "@tamagui/lucide-icons";
+import { Check, ChevronDown, X } from "@tamagui/lucide-icons-2";
 import { useState } from "react";
 import DatePicker from "react-native-date-picker";
 import { Button, ListItem, View } from "tamagui";
@@ -23,8 +23,7 @@ const DateSelect = ({ id, value, onChange, minimumDate }: DateSelectProps) => {
           setSheetOpen(true);
           setInternalDate(value ?? new Date());
         }}
-        radiused
-        pressTheme
+        borderRadius="$4"
         borderWidth={1}
       >
         {value?.toLocaleString()}
