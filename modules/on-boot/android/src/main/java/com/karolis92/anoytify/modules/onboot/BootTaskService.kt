@@ -6,7 +6,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 
 class BootTaskService : HeadlessJsTaskService() {
-    override fun getTaskConfig(intent: Intent): HeadlessJsTaskConfig? {
+    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig? {
         return HeadlessJsTaskConfig(
             "annoytify-onboot",
             Arguments.createMap(),

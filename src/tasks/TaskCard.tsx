@@ -1,4 +1,4 @@
-import { CalendarClock, Check, Repeat2 } from "@tamagui/lucide-icons";
+import { CalendarClock, Check, Repeat2 } from "@tamagui/lucide-icons-2";
 import { Card, CardProps, Checkbox, Text, View, XStack } from "tamagui";
 import { Repeat } from "../common/enums/Repeat";
 import { Task } from "./db/models";
@@ -17,7 +17,8 @@ const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
 
   return (
     <Card
-      bordered
+      borderWidth={1}
+      borderColor="$gray6"
       pressStyle={{ backgroundColor: "$backgroundPress" }}
       {...cardProps}
     >

@@ -1,10 +1,10 @@
-import { Check, ChevronDown } from "@tamagui/lucide-icons";
+import { Check, ChevronDown } from "@tamagui/lucide-icons-2";
 import {
   Adapt,
-  Sheet,
   Select as TamaguiSelect,
   SelectProps as TamaguiSelectProps,
 } from "tamagui";
+import Sheet from "./Sheet";
 
 interface SelectProps extends TamaguiSelectProps {
   items: { text: string; value: string }[];
@@ -18,17 +18,8 @@ const Select = ({ items, ...props }: SelectProps) => {
       </TamaguiSelect.Trigger>
 
       <Adapt when="sm" platform="touch">
-        <Sheet modal dismissOnSnapToBottom snapPointsMode="fit">
-          <Sheet.Frame>
-            <Sheet.ScrollView>
-              <Adapt.Contents />
-            </Sheet.ScrollView>
-          </Sheet.Frame>
-          <Sheet.Overlay
-            animation="lazy"
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
+        <Sheet>
+          <Adapt.Contents />
         </Sheet>
       </Adapt>
 

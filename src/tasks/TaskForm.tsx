@@ -1,5 +1,5 @@
 import { useQuery, useRealm } from "@realm/react";
-import { Save, Trash2, X } from "@tamagui/lucide-icons";
+import { Save, Trash2, X } from "@tamagui/lucide-icons-2";
 import { useState } from "react";
 import { ToastAndroid } from "react-native";
 import { BSON } from "realm";
@@ -127,13 +127,12 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
         </Button>
         {existingTask && (
           <Button
-            icon={Trash2}
+            icon={<Trash2 color="$red10" />}
             variant="outlined"
-            borderColor="$red4"
-            color="$red10"
+            borderColor="$red7"
             onPress={onDelete}
           >
-            Delete
+            <Button.Text color="$red10">Delete</Button.Text>
           </Button>
         )}
       </View>

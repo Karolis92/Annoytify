@@ -1,5 +1,5 @@
 import { useQuery } from "@realm/react";
-import { Plus } from "@tamagui/lucide-icons";
+import { Plus } from "@tamagui/lucide-icons-2";
 import { useState } from "react";
 import { BSON } from "realm";
 import { Button, ScrollView, View } from "tamagui";
@@ -44,8 +44,6 @@ const TasksScreen = () => {
       <Sheet
         open={sheetState.open}
         onOpenChange={(open: boolean) => setSheetState({ ...sheetState, open })}
-        snapPointsMode="percent"
-        snapPoints={[95]}
       >
         <TaskForm
           taskId={sheetState.taskId}

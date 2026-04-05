@@ -1,4 +1,4 @@
-import { config } from "@tamagui/config/v2";
+import { config } from "@tamagui/config";
 import { PropsWithChildren } from "react";
 import { TamaguiProvider, createTamagui } from "tamagui";
 import ThemedStatusBar from "./ThemedStatusBar";

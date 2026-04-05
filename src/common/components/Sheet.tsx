@@ -10,7 +10,6 @@ const Sheet = (sheetsProps: SheetProps) => {
       {...sheetsProps}
     >
       <TamaguiSheet.Overlay
-        animation="quick"
         enterStyle={{ opacity: 0 }}
         exitStyle={{ opacity: 0 }}
       />

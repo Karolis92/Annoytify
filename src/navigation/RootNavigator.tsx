@@ -1,10 +1,10 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ArrowLeft, Settings2 } from "@tamagui/lucide-icons";
+import { ArrowLeft, Settings2 } from "@tamagui/lucide-icons-2";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, useTheme } from "tamagui";
-import TasksScreen from "../tasks/TasksScreen";
 import SettingsScreen from "../settings/SettingsScreen";
+import TasksScreen from "../tasks/TasksScreen";
 import RootNavigatorParamList from "./RootNavigatorParamList";
 
 const Stack = createNativeStackNavigator<RootNavigatorParamList>();
@@ -19,8 +19,9 @@ const RootNavigator = () => {
     >
       <NavigationContainer
         theme={{
-          dark: true,
+          ...DarkTheme,
           colors: {
+            ...DarkTheme.colors,
             background: theme.background.get(),
             border: theme.borderColor.get(),
             card: theme.background.get(),
