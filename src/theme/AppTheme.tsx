@@ -1,6 +1,7 @@
 import { config } from "@tamagui/config";
 import { PropsWithChildren } from "react";
 import { TamaguiProvider, createTamagui } from "tamagui";
+import { useAppTheme } from "./ThemeContext";
 import ThemedStatusBar from "./ThemedStatusBar";
 
 const tamaguiConfig = createTamagui(config);
@@ -12,8 +13,10 @@ declare module "tamagui" {
 }
 
 const AppThemeProvider = ({ children }: PropsWithChildren) => {
+  const { resolvedTheme } = useAppTheme();
+
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme="dark">
+    <TamaguiProvider config={tamaguiConfig} defaultTheme={resolvedTheme}>
       <ThemedStatusBar />
       {children}
     </TamaguiProvider>
