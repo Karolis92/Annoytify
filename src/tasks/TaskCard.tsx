@@ -1,16 +1,17 @@
 import { CalendarClock, Check, Repeat2 } from "@tamagui/lucide-icons-2";
 import { Card, CardProps, Checkbox, Text, View, XStack } from "tamagui";
+import { Task } from "../common/db/schema";
 import { Repeat } from "../common/enums/Repeat";
-import { Task } from "./db/models";
-import tasksService from "./services/tasksService";
+import { getTasksService } from "./services/tasksService";
 
 interface TaskCardProps extends CardProps {
   task: Task;
 }
 
 const TaskCard = ({ task, ...cardProps }: TaskCardProps) => {
-  const onDoneChange = (done: boolean) => {
-    tasksService.changeState(task, done);
+  const onDoneChange = async (done: boolean) => {
+    const taskService = await getTasksService();
+    await taskService.changeState(task, done);
   };
 
   const textDecorationLine = task.done ? "line-through" : undefined;

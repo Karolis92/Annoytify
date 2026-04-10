@@ -6,13 +6,23 @@ import {
 } from "tamagui";
 import Sheet from "./Sheet";
 
-interface SelectProps extends TamaguiSelectProps {
-  items: { text: string; value: string }[];
+interface SelectProps<
+  Value extends string = string,
+> extends TamaguiSelectProps<Value> {
+  items: { text: string; value: Value }[];
 }
 
-const Select = ({ items, ...props }: SelectProps) => {
+const Select = <Value extends string = string>({
+  items,
+  ...props
+}: SelectProps<Value>) => {
   return (
-    <TamaguiSelect disablePreventBodyScroll {...props}>
+    <TamaguiSelect
+      disablePreventBodyScroll
+      // fix bug where displayed value doesn't update when value changes asynchronously
+      key={props.value}
+      {...props}
+    >
       <TamaguiSelect.Trigger iconAfter={ChevronDown}>
         <TamaguiSelect.Value />
       </TamaguiSelect.Trigger>

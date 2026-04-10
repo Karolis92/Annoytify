@@ -1,33 +1,52 @@
-import { BSON, UpdateMode } from "realm";
-import realm from "../../common/db/realm";
-import { ITask, Task } from "./models";
+import { and, eq, lte } from "drizzle-orm";
+import { AppDatabase, getDatabase } from "../../common/db/database";
+import { NewTask, Task, tasks } from "../../common/db/schema";
 
-class TasksRepository {
-  get(id: string | BSON.ObjectId) {
-    return realm.objectForPrimaryKey(Task, new BSON.ObjectId(id));
+export class TasksRepository {
+  constructor(private db: AppDatabase) {}
+
+  selectAll() {
+    return this.db.select().from(tasks);
   }
 
-  getOngoing() {
-    return realm
-      .objects(Task)
-      .filtered("date <= $0 && done != true", new Date());
+  selectById(id: string) {
+    return this.db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
   }
 
-  upsert(task: ITask) {
-    return realm.write(() => realm.create(Task, task, UpdateMode.Modified));
+  selectOngoing() {
+    return this.db
+      .select()
+      .from(tasks)
+      .where(and(lte(tasks.date, new Date()), eq(tasks.done, false)));
   }
 
-  delete(task: Task) {
-    realm.write(() => {
-      realm.delete(task);
-    });
+  async create(task: NewTask): Promise<Task> {
+    const [createdTask] = await this.db.insert(tasks).values(task).returning();
+    if (!createdTask) {
+      throw new Error("Failed to create task");
+    }
+    return createdTask;
   }
 
-  changeState(task: Task, done = true) {
-    realm.write(() => {
-      task.done = done;
-    });
+  async update(task: Task): Promise<Task> {
+    const [updatedTask] = await this.db
+      .update(tasks)
+      .set(task)
+      .where(eq(tasks.id, task.id))
+      .returning();
+    if (!updatedTask) {
+      throw new Error(`Failed to update task with id ${task.id}`);
+    }
+    return updatedTask;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.db.delete(tasks).where(eq(tasks.id, id));
   }
 }
 
-export default new TasksRepository();
+const repositoryPromise = getDatabase().then(
+  (database) => new TasksRepository(database),
+);
+
+export const getTasksRepository = () => repositoryPromise;

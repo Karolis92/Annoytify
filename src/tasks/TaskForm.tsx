@@ -1,8 +1,6 @@
-import { useQuery, useRealm } from "@realm/react";
 import { Save, Trash2, X } from "@tamagui/lucide-icons-2";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastAndroid } from "react-native";
-import { BSON } from "realm";
 import {
   Button,
   Form,
@@ -16,31 +14,36 @@ import {
 import DateSelect from "../common/components/DateSelect";
 import Select from "../common/components/Select";
 import { Repeat } from "../common/enums/Repeat";
-import { ITask, Task } from "./db/models";
-import tasksService from "./services/tasksService";
+import useTask from "./hooks/useTask";
+import { getTasksService } from "./services/tasksService";
 
-interface TaskForm {
-  taskId?: BSON.ObjectId;
+interface TaskFormProps {
+  taskId?: string;
   onClose: () => void;
 }
 
-const TaskForm = ({ taskId, onClose }: TaskForm) => {
-  const realm = useRealm();
+const TaskForm = ({ taskId, onClose }: TaskFormProps) => {
   const [titleError, setTitleError] = useState<string>();
-  const [existingTask] = useQuery(
-    Task,
-    (tasks) => tasks.filtered("_id == $0", taskId),
-    [taskId],
-  );
-
-  const [formState, setFormState] = useState<ITask>(() => ({
-    _id: existingTask?._id ?? new BSON.ObjectId(),
+  const existingTask = useTask(taskId);
+  const [formState, setFormState] = useState(() => ({
     title: existingTask?.title ?? "",
     description: existingTask?.description ?? "",
     date: existingTask?.date ?? new Date(),
     repeat: existingTask?.repeat ?? Repeat.No,
-    done: false,
+    done: existingTask?.done ?? false,
   }));
+
+  useEffect(() => {
+    if (existingTask) {
+      setFormState({
+        title: existingTask.title,
+        description: existingTask.description,
+        date: existingTask.date,
+        repeat: existingTask.repeat,
+        done: existingTask.done,
+      });
+    }
+  }, [existingTask]);
 
   const changeHandler =
     (field: string) =>
@@ -48,12 +51,20 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
       setFormState({ ...formState, [field]: value });
     };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!formState.title) {
       setTitleError("Title is required");
       return;
     }
-    tasksService.createOrUpdate(formState);
+    const tasksService = await getTasksService();
+    if (existingTask) {
+      await tasksService.update({
+        ...existingTask,
+        ...formState,
+      });
+    } else {
+      await tasksService.create(formState);
+    }
     onClose();
     ToastAndroid.show(
       existingTask ? "Task updated!" : "Task created!",
@@ -61,9 +72,10 @@ const TaskForm = ({ taskId, onClose }: TaskForm) => {
     );
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
     if (existingTask) {
-      tasksService.delete(existingTask);
+      const tasksService = await getTasksService();
+      await tasksService.delete(existingTask.id);
       onClose();
       ToastAndroid.show("Task deleted!", ToastAndroid.SHORT);
     }

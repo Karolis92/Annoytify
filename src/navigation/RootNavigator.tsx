@@ -1,8 +1,9 @@
 import { DarkTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft, Settings2 } from "@tamagui/lucide-icons-2";
+import { Suspense } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Button, useTheme } from "tamagui";
+import { Button, Spinner, useTheme } from "tamagui";
 import SettingsScreen from "../settings/SettingsScreen";
 import TasksScreen from "../tasks/TasksScreen";
 import RootNavigatorParamList from "./RootNavigatorParamList";
@@ -32,6 +33,21 @@ const RootNavigator = () => {
         }}
       >
         <Stack.Navigator
+          screenLayout={({ children }) => (
+            <Suspense
+              fallback={
+                <Spinner
+                  size="large"
+                  inset={0}
+                  position="absolute"
+                  alignItems="center"
+                  justifyContent="center"
+                />
+              }
+            >
+              {children}
+            </Suspense>
+          )}
           screenOptions={({ navigation }) => ({
             headerTitleAlign: "center",
             headerBackVisible: false,

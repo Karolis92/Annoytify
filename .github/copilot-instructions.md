@@ -15,7 +15,7 @@ The app **cannot** run on Expo Go because it uses native modules. Use an EAS dev
 | UI components | Tamagui v1 |
 | Icons | `@tamagui/lucide-icons` |
 | Navigation | React Navigation v6 (native stack) |
-| Local database | Realm / `@realm/react` |
+| Local database | Expo SQLite + Drizzle ORM |
 | Notifications | `@notifee/react-native` |
 | Date utilities | `date-fns` v4 |
 | Formatting | Prettier (config in `.prettierrc`) |

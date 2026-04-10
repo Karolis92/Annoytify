@@ -1,17 +1,18 @@
 import "react-native-get-random-values";
-import AppRealmProvider from "./src/common/db/AppRealmProvider";
 import RootNavigator from "./src/navigation/RootNavigator";
-import useTaskNotificationEvents from "./src/tasks/useTaskNotificationEvents";
+import { registerOnBootListener } from "./src/tasks/events/bootEvents";
+import { registerNotificationEventsListener } from "./src/tasks/events/notificationEvents";
 import AppThemeProvider from "./src/theme/AppTheme";
 
+registerOnBootListener();
+const { useNotificationEvents } = registerNotificationEventsListener();
+
 export default function App() {
-  useTaskNotificationEvents();
+  useNotificationEvents();
 
   return (
-    <AppRealmProvider>
-      <AppThemeProvider>
-        <RootNavigator />
-      </AppThemeProvider>
-    </AppRealmProvider>
+    <AppThemeProvider>
+      <RootNavigator />
+    </AppThemeProvider>
   );
 }

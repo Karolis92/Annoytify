@@ -1,31 +1,29 @@
-import { useQuery } from "@realm/react";
 import { Plus } from "@tamagui/lucide-icons-2";
 import { useState } from "react";
-import { BSON } from "realm";
 import { Button, ScrollView, View } from "tamagui";
 import Sheet from "../common/components/Sheet";
+import useTasks from "./hooks/useTasks";
 import TaskCard from "./TaskCard";
 import TaskForm from "./TaskForm";
-import { Task } from "./db/models";
 
 interface SheetState {
   open: boolean;
-  taskId?: BSON.ObjectId;
+  taskId?: string;
 }
 
 const TasksScreen = () => {
-  const tasks = useQuery(Task);
+  const taskRows = useTasks();
   const [sheetState, setSheetState] = useState<SheetState>({ open: false });
 
   return (
     <View padding="$3" flex={1}>
       <ScrollView>
         <View mb="$12" gap="$4">
-          {tasks.map((task) => (
+          {taskRows.map((task) => (
             <TaskCard
-              key={task._id.toString()}
+              key={task.id}
               task={task}
-              onPress={() => setSheetState({ open: true, taskId: task._id })}
+              onPress={() => setSheetState({ open: true, taskId: task.id })}
             />
           ))}
         </View>

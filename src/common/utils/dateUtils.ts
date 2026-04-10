@@ -1,6 +1,6 @@
 import { add, isFuture, isPast, set, startOfToday } from "date-fns";
 
-export const getNextDailyOccurence = (date: Date) => {
+export const getNextDailyOccurrence = (date: Date) => {
   let newDate: Date;
   if (isFuture(date)) {
     newDate = add(date, { days: 1 });
@@ -11,14 +11,14 @@ export const getNextDailyOccurence = (date: Date) => {
       minutes: date.getMinutes(),
     });
     if (isPast(newDate)) {
-      // if in past, then it's tomorow
+      // if in past, then it's tomorrow
       newDate = add(newDate, { days: 1 });
     }
   }
   return newDate;
 };
 
-export const getNextMonthlyOccurence = (date: Date) => {
+export const getNextMonthlyOccurrence = (date: Date) => {
   let newDate: Date;
   if (isFuture(date)) {
     newDate = add(date, { months: 1 });

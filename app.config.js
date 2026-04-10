@@ -37,6 +37,7 @@ export default {
         },
       },
     ],
+    "expo-sqlite",
   ],
   extra: {
     eas: {
