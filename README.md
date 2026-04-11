@@ -14,13 +14,12 @@ App will not work with Expo Go as it utilizes native code to restore notificatio
 For Expo Go like experience EAS development build can be used (`build:dev` + `start:dev`). For EAS builds install `npm install -g eas-cli`
 
 App can also be built locally with Android Studio and used with emulator (`start:dev:emulator`)
-For local Android builds with Expo SDK 55, install and use **JDK 17+** (Gradle 9 requirement).
 
 ## Scripts
 
 `start:dev` - run development server for development build
 
-`start:dev:emulator` - build and start app on local machine for android emulator ([prerequisites](https://docs.expo.dev/guides/local-app-development/#android) needed)
+`start:dev:emulator` - build and start app on local machine for android emulator ([prerequisites](https://docs.expo.dev/guides/local-app-development/#android) needed). If gradle build is failing - try reinstalling NDK trough android studio.
 
 `build` - build production app (aab) using EAS
 
