@@ -9,7 +9,7 @@ App is still work in progress
 
 ## Setup
 
-App will not work with Expo Go as it utilizes native code to restore notification after boot. Also uses some libraries that provide only native code.
+App will not work with Expo Go as it utilizes native code to restore due notifications and re-schedule future reminders after boot. Also uses some libraries that provide only native code.
 
 For Expo Go like experience EAS development build can be used (`build:dev` + `start:dev`). For EAS builds install `npm install -g eas-cli`
 

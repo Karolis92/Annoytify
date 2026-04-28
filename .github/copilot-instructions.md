@@ -78,6 +78,8 @@ npm run format                # Run Prettier on the whole project
 
 - **Android only**: Android is the only supported/released platform. `app.config.js` may still contain `ios` and `web` configuration blocks for Expo tooling compatibility, but those targets are not maintained and should not be treated as active targets; do not add iOS- or web-specific code.
 - The app must survive process death and device reboots – notification restoration on boot is handled by `registerOnBootTask` in `modules/on-boot`.
+- Do **not** introduce `WorkManager` for boot restoration or notification event delivery. Those flows are immediate, event-driven Android work, so they should stay on the direct `BroadcastReceiver`/headless task path; `WorkManager` is for deferrable background jobs and may delay execution in ways that break notification UX.
+- `AlarmManager` alarms do **not** survive device reboot, so boot handling must explicitly reschedule future reminders from persisted task data instead of only restoring already-due notifications.
 - Notifications are created as `ongoing: true` and `autoCancel: false` so they persist even after the user swipes them away.
 - `Task._id` is a `BSON.ObjectId`; always call `.toString()` before passing it to notification APIs.
 - When creating a recurring task that is marked done, a new `Task` document with a fresh `_id` is inserted for the next occurrence; the original task's `repeat` field is set to `Repeat.No`.

@@ -26,19 +26,7 @@ export default {
   web: {
     favicon: "./assets/favicon.png",
   },
-  plugins: [
-    [
-      "expo-build-properties",
-      {
-        android: {
-          extraMavenRepos: [
-            "../../node_modules/@notifee/react-native/android/libs",
-          ],
-        },
-      },
-    ],
-    "expo-sqlite",
-  ],
+  plugins: ["expo-sqlite"],
   extra: {
     eas: {
       projectId: "1133cd36-bdc5-4cab-b78e-fe59886c0780",

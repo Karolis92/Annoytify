@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+  <application>
+    <receiver
+      android:name=".NotificationEventReceiver"
+      android:exported="false" />
+    <receiver
+      android:name=".ScheduledNotificationReceiver"
+      android:exported="false" />
+    <service
+      android:name=".NotificationEventTaskService"
+      android:exported="false" />
+  </application>
+</manifest>

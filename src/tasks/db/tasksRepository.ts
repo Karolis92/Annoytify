@@ -1,4 +1,4 @@
-import { and, eq, lte } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { AppDatabase, getDatabase } from "../../common/db/database";
 import { NewTask, Task, tasks } from "../../common/db/schema";
 
@@ -13,11 +13,8 @@ export class TasksRepository {
     return this.db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
   }
 
-  selectOngoing() {
-    return this.db
-      .select()
-      .from(tasks)
-      .where(and(lte(tasks.date, new Date()), eq(tasks.done, false)));
+  selectUnfinished() {
+    return this.db.select().from(tasks).where(eq(tasks.done, false));
   }
 
   async create(task: NewTask): Promise<Task> {

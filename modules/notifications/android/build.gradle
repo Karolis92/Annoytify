@@ -3,11 +3,11 @@ plugins {
   id 'expo-module-gradle-plugin'
 }
 
-group = 'app.annoytify.modules.onboot'
+group = 'app.annoytify.modules.notifications'
 version = '0.7.10'
 
 android {
-  namespace "app.annoytify.modules.onboot"
+  namespace "app.annoytify.modules.notifications"
   defaultConfig {
     versionCode 1
     versionName "0.7.10"
@@ -18,5 +18,6 @@ android {
 }
 
 dependencies {
+  implementation "androidx.core:core-ktx:1.17.0"
   compileOnly "com.facebook.react:react-android"
 }
