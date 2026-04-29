@@ -116,6 +116,14 @@ class NotificationsModule : Module() {
 
       NotificationsManager.cancelNotification(reactContext, id)
     }
+
+    AsyncFunction("restorePersistedNotificationsAsync") {
+      val reactContext = requireNotNull(appContext?.reactContext) {
+        "React context is not available"
+      }
+
+      NotificationsManager.restorePersistedNotifications(reactContext)
+    }
   }
 
   private fun handleNotificationIntent(intent: Intent) {

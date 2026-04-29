@@ -59,4 +59,8 @@ export function cancelNotificationAsync(id: string) {
   return NotificationsModule.cancelNotificationAsync(id);
 }
 
+export function restorePersistedNotificationsAsync() {
+  return NotificationsModule.restorePersistedNotificationsAsync();
+}
+
 export * from "./src/NotificationsModule.types";

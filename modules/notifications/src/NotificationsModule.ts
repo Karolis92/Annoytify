@@ -16,6 +16,7 @@ export interface NotificationsModuleNative {
     timestamp: number,
   ): Promise<void>;
   cancelNotificationAsync(id: string): Promise<void>;
+  restorePersistedNotificationsAsync(): Promise<void>;
 }
 
 export default requireNativeModule<NotificationsModuleNative>(

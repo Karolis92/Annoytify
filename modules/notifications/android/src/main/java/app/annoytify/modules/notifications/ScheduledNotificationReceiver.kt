@@ -8,10 +8,15 @@ import org.json.JSONException
 
 class ScheduledNotificationReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
+    if (intent?.action != NotificationsConstants.actionScheduledNotification) {
+      Log.w(NotificationsLogger.tag, "Ignoring unsupported scheduled notification action=${intent?.action}")
+      return
+    }
+
     val notificationJson = intent?.getStringExtra(NotificationsConstants.extraNotificationJson)
 
     if (notificationJson == null) {
-      Log.e(logTag, "Scheduled notification intent is missing the payload.")
+      Log.e(NotificationsLogger.tag, "Scheduled notification intent is missing the payload.")
       return
     }
 
@@ -21,11 +26,7 @@ class ScheduledNotificationReceiver : BroadcastReceiver() {
         NotificationsJson.parseNotification(notificationJson)
       )
     } catch (error: JSONException) {
-      Log.e(logTag, "Failed to parse scheduled notification payload.", error)
+      Log.e(NotificationsLogger.tag, "Failed to parse scheduled notification payload.", error)
     }
-  }
-
-  private companion object {
-    const val logTag = "ScheduledNotification"
   }
 }

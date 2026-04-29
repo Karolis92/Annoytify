@@ -7,6 +7,7 @@ import {
   NotificationRequest,
   requestExactAlarmPermissionAsync,
   requestNotificationPermissionAsync,
+  restorePersistedNotificationsAsync,
   scheduleNotificationAsync,
   setNotificationChannelsAsync,
 } from "../../../modules/notifications";
@@ -24,6 +25,7 @@ class NotificationsService {
 
   private async setup() {
     await setNotificationChannelsAsync(appNotificationChannels);
+    await restorePersistedNotificationsAsync();
   }
 
   private ensureSetup() {
@@ -63,6 +65,11 @@ class NotificationsService {
 
   cancelNotification(id: string) {
     return cancelNotificationAsync(id);
+  }
+
+  async restorePersistedNotifications() {
+    await this.ensureSetup();
+    return restorePersistedNotificationsAsync();
   }
 }
 

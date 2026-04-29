@@ -9,7 +9,7 @@ import org.json.JSONException
 internal object NotificationEventDispatcher {
   fun dispatchFromIntent(context: Context, intent: Intent?): Boolean {
     if (intent == null) {
-      Log.e(logTag, "Notification event intent is missing.")
+      Log.e(NotificationsLogger.tag, "Notification event intent is missing.")
       return false
     }
 
@@ -17,7 +17,7 @@ internal object NotificationEventDispatcher {
     val eventType = intent.getStringExtra(NotificationsConstants.extraEventType)
 
     if (notificationJson.isNullOrEmpty() || eventType.isNullOrEmpty()) {
-      Log.e(logTag, "Notification event intent is missing required extras.")
+      Log.e(NotificationsLogger.tag, "Notification event intent is missing required extras.")
       return false
     }
 
@@ -38,7 +38,7 @@ internal object NotificationEventDispatcher {
     val eventJson = try {
       NotificationsJson.createEventJson(eventType, notificationJson, actionId)
     } catch (error: JSONException) {
-      Log.e(logTag, "Failed to parse notification event payload.", error)
+      Log.e(NotificationsLogger.tag, "Failed to parse notification event payload.", error)
       return false
     }
 
@@ -50,11 +50,9 @@ internal object NotificationEventDispatcher {
         }
       )
       true
-    } catch (error: IllegalStateException) {
-      Log.e(logTag, "Failed to start notification headless task.", error)
+    } catch (error: RuntimeException) {
+      Log.e(NotificationsLogger.tag, "Failed to start notification headless task.", error)
       false
     }
   }
-
-  private const val logTag = "NotificationEvents"
 }

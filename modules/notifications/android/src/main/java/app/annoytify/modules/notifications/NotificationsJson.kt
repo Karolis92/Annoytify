@@ -31,7 +31,7 @@ internal object NotificationsJson {
       .toString()
   }
 
-  private fun parseNotification(notification: JSONObject): NotificationRequestRecord {
+  internal fun parseNotification(notification: JSONObject): NotificationRequestRecord {
     return NotificationRequestRecord(
       id = notification.getString("id"),
       title = notification.getString("title"),
@@ -80,7 +80,7 @@ private fun NotificationActionRecord.toJson(): JSONObject {
     .put("title", title)
 }
 
-private fun JSONObject.optStringOrNull(key: String): String? {
+internal fun JSONObject.optStringOrNull(key: String): String? {
   return if (has(key) && !isNull(key)) {
     getString(key)
   } else {
@@ -88,7 +88,7 @@ private fun JSONObject.optStringOrNull(key: String): String? {
   }
 }
 
-private fun JSONObject.putIfNotNull(key: String, value: Any?): JSONObject {
+internal fun JSONObject.putIfNotNull(key: String, value: Any?): JSONObject {
   if (value != null) {
     put(key, value)
   }

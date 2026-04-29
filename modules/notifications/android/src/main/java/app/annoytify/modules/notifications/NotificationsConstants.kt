@@ -1,6 +1,8 @@
 package app.annoytify.modules.notifications
 
 internal object NotificationsConstants {
+  const val actionNotificationEvent = "app.annoytify.modules.notifications.ACTION_NOTIFICATION_EVENT"
+  const val actionScheduledNotification = "app.annoytify.modules.notifications.ACTION_SCHEDULED_NOTIFICATION"
   const val extraActionId = "actionId"
   const val extraEventJson = "eventJson"
   const val extraEventType = "eventType"

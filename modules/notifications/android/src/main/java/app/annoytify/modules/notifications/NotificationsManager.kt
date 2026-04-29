@@ -1,6 +1,7 @@
 package app.annoytify.modules.notifications
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,32 +10,48 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlin.math.max
 
 internal object NotificationsManager {
   private const val notificationTagId = 0
+  private const val defaultChannelId = "reminders"
+  private const val defaultChannelName = "Reminders"
+  private const val defaultRequestCode = 0
 
   fun setNotificationChannels(
     context: Context,
     channels: List<NotificationChannelRecord>
   ) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      return
-    }
+    NotificationsStorage.setChannels(context, channels)
 
-    val notificationManager = context.getSystemService(NotificationManager::class.java)
-    channels.forEach { channel ->
-      notificationManager.createNotificationChannel(
-        NotificationChannel(
-          channel.id,
-          channel.name,
-          NotificationManager.IMPORTANCE_DEFAULT
-        ).apply {
-          description = channel.description
-        }
+    if (channels.isNotEmpty()) {
+      ensureNotificationChannels(context, channels)
+    }
+  }
+
+  fun restorePersistedNotifications(context: Context) {
+    ensureNotificationChannels(context)
+
+    val nowMillis = System.currentTimeMillis()
+    NotificationsStorage.getReminders(context).forEach { reminder ->
+      applyReminder(context, reminder, nowMillis, throwOnBlocked = false)
+    }
+  }
+
+  fun handleNotificationEvent(
+    context: Context,
+    notification: NotificationRequestRecord,
+    eventType: String
+  ) {
+    if (eventType == NotificationsConstants.eventDismissed && notification.ongoing) {
+      Log.i(
+        NotificationsLogger.tag,
+        "Re-displaying ongoing notification after dismiss for id=${notification.id}"
       )
+      displayNotification(context, notification)
     }
   }
 
@@ -52,15 +69,11 @@ internal object NotificationsManager {
   }
 
   fun requestExactAlarmPermission(context: Context): Boolean {
-    if (canScheduleExactAlarms(context)) {
+    if (canScheduleExactAlarms(context) || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
       return true
     }
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-      return true
-    }
-
-    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+    val requestIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
       data = Uri.parse("package:${context.packageName}")
       addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -70,21 +83,37 @@ internal object NotificationsManager {
       addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-    val settingsIntent = if (intent.resolveActivity(context.packageManager) != null) {
-      intent
-    } else {
-      fallbackIntent
-    }
+    context.startActivity(
+      if (requestIntent.resolveActivity(context.packageManager) != null) {
+        requestIntent
+      } else {
+        fallbackIntent
+      }
+    )
 
-    context.startActivity(settingsIntent)
     return false
   }
 
-  fun displayNotification(context: Context, notification: NotificationRequestRecord) {
+  fun displayNotification(
+    context: Context,
+    notification: NotificationRequestRecord,
+    triggerAtMillis: Long = System.currentTimeMillis()
+  ) {
+    ensureNotificationChannels(context, notification)
+
     NotificationManagerCompat.from(context).notify(
       notification.id,
       notificationTagId,
       buildNotification(context, notification)
+    )
+
+    NotificationsStorage.upsertReminder(
+      context,
+      PersistedReminderRecord(
+        notification = notification,
+        triggerAtMillis = triggerAtMillis,
+        state = PersistedReminderState.Displayed
+      )
     )
   }
 
@@ -93,15 +122,82 @@ internal object NotificationsManager {
     notification: NotificationRequestRecord,
     timestamp: Long
   ) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val triggerAtMillis = max(timestamp, System.currentTimeMillis() + 1000)
-    val pendingIntent = createSchedulePendingIntent(context, notification.id, notification)
+    ensureNotificationChannels(context, notification)
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-      throw IllegalStateException(
-        "Exact alarm permission is required to schedule notifications on Android 12+."
+    applyReminder(
+      context,
+      PersistedReminderRecord(
+        notification = notification,
+        triggerAtMillis = timestamp,
+        state = PersistedReminderState.Scheduled
+      ),
+      System.currentTimeMillis(),
+      throwOnBlocked = true
+    )
+  }
+
+  fun cancelNotification(context: Context, id: String) {
+    NotificationManagerCompat.from(context).cancel(id, notificationTagId)
+
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    alarmManager.cancel(createSchedulePendingIntent(context, id))
+    NotificationsStorage.removeReminder(context, id)
+  }
+
+  private fun applyReminder(
+    context: Context,
+    reminder: PersistedReminderRecord,
+    nowMillis: Long,
+    throwOnBlocked: Boolean
+  ) {
+    when (
+      ReminderRestorePlanner.decide(
+        triggerAtMillis = reminder.triggerAtMillis,
+        nowMillis = nowMillis,
+        canScheduleExactAlarms = canScheduleExactAlarms(context)
       )
+    ) {
+      ReminderRestoreAction.Display -> displayNotification(
+        context,
+        reminder.notification,
+        reminder.triggerAtMillis
+      )
+
+      ReminderRestoreAction.Schedule -> {
+        scheduleExactAlarm(context, reminder.notification, reminder.triggerAtMillis)
+        NotificationsStorage.upsertReminder(
+          context,
+          reminder.copy(state = PersistedReminderState.Scheduled)
+        )
+      }
+
+      ReminderRestoreAction.WaitForExactAlarmPermission -> {
+        Log.w(
+          NotificationsLogger.tag,
+          "Exact alarm permission is missing for notification id=${reminder.notification.id}"
+        )
+        NotificationsStorage.upsertReminder(
+          context,
+          reminder.copy(state = PersistedReminderState.Blocked)
+        )
+
+        if (throwOnBlocked) {
+          throw IllegalStateException(
+            "Exact alarm permission is required to schedule notifications on Android 12+."
+          )
+        }
+      }
     }
+  }
+
+  private fun scheduleExactAlarm(
+    context: Context,
+    notification: NotificationRequestRecord,
+    timestamp: Long
+  ) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val triggerAtMillis = max(timestamp, System.currentTimeMillis() + 1_000)
+    val pendingIntent = createSchedulePendingIntent(context, notification.id, notification)
 
     when {
       Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ->
@@ -127,17 +223,62 @@ internal object NotificationsManager {
     }
   }
 
-  fun cancelNotification(context: Context, id: String) {
-    NotificationManagerCompat.from(context).cancel(id, notificationTagId)
+  private fun ensureNotificationChannels(
+    context: Context,
+    channels: List<NotificationChannelRecord> = NotificationsStorage.getChannels(context)
+  ): List<NotificationChannelRecord> {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return channels
+    }
 
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    alarmManager.cancel(createSchedulePendingIntent(context, id))
+    val resolvedChannels = channels.ifEmpty {
+      listOf(
+        NotificationChannelRecord(
+          id = defaultChannelId,
+          name = defaultChannelName
+        )
+      )
+    }
+
+    val notificationManager = context.getSystemService(NotificationManager::class.java)
+    resolvedChannels.forEach { channel ->
+      notificationManager.createNotificationChannel(
+        NotificationChannel(
+          channel.id,
+          channel.name,
+          NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+          description = channel.description
+        }
+      )
+    }
+
+    return resolvedChannels
+  }
+
+  private fun ensureNotificationChannels(
+    context: Context,
+    notification: NotificationRequestRecord
+  ) {
+    val storedChannels = NotificationsStorage.getChannels(context)
+
+    if (storedChannels.any { it.id == notification.channelId }) {
+      ensureNotificationChannels(context, storedChannels)
+      return
+    }
+
+    val mergedChannels = storedChannels + NotificationChannelRecord(
+      id = notification.channelId,
+      name = notification.channelId
+    )
+    NotificationsStorage.setChannels(context, mergedChannels)
+    ensureNotificationChannels(context, mergedChannels)
   }
 
   private fun buildNotification(
     context: Context,
     notification: NotificationRequestRecord
-  ): android.app.Notification {
+  ): Notification {
     val builder = NotificationCompat.Builder(context, notification.channelId)
       .setSmallIcon(resolveSmallIcon(context))
       .setContentTitle(notification.title)
@@ -185,11 +326,12 @@ internal object NotificationsManager {
     notification: NotificationRequestRecord? = null
   ): PendingIntent {
     val intent = Intent(context, ScheduledNotificationReceiver::class.java).apply {
+      action = NotificationsConstants.actionScheduledNotification
       data = Uri.parse("annoytify://notifications/${Uri.encode(id)}/schedule")
     }
 
     if (notification != null) {
-      intent.putExtra(
+      putExtra(
         NotificationsConstants.extraNotificationJson,
         NotificationsJson.serializeNotification(notification)
       )
@@ -197,7 +339,7 @@ internal object NotificationsManager {
 
     return PendingIntent.getBroadcast(
       context,
-      createRequestCode(id, "schedule"),
+      defaultRequestCode,
       intent,
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -211,6 +353,7 @@ internal object NotificationsManager {
     actionId: String? = null
   ): PendingIntent {
     val intent = Intent(context, NotificationEventReceiver::class.java).apply {
+      action = NotificationsConstants.actionNotificationEvent
       data = Uri.parse("annoytify://notifications/${Uri.encode(notification.id)}/$route")
       putExtra(
         NotificationsConstants.extraNotificationJson,
@@ -224,7 +367,7 @@ internal object NotificationsManager {
 
     return PendingIntent.getBroadcast(
       context,
-      createRequestCode(notification.id, route),
+      defaultRequestCode,
       intent,
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -250,7 +393,7 @@ internal object NotificationsManager {
     return if (launchIntent != null) {
       PendingIntent.getActivity(
         context,
-        createRequestCode(notification.id, "content"),
+        defaultRequestCode,
         launchIntent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
       )
@@ -262,10 +405,6 @@ internal object NotificationsManager {
         route = "press"
       )
     }
-  }
-
-  private fun createRequestCode(id: String, route: String): Int {
-    return (id.hashCode() * 31 + route.hashCode())
   }
 
   private fun resolveSmallIcon(context: Context): Int {

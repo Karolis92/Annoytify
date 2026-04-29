@@ -3,9 +3,7 @@ import { getTasksService } from "../services/tasksService";
 
 export const registerOnBootListener = () => {
   registerOnBootTask(async () => {
-    console.log(
-      "Boot event: Restoring due notifications and re-scheduling future reminders...",
-    );
+    console.log("Boot event: Reconciling native reminder state with stored tasks...");
     const tasksService = await getTasksService();
     await tasksService.restoreNotificationsAfterRestart();
   });

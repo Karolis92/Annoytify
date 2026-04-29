@@ -13,9 +13,6 @@ export const registerNotificationEventsListener = () => {
       switch (type) {
         case NotificationEventType.Dismissed:
           console.log(`User dismissed notification`);
-          if (notification.ongoing) {
-            await notificationsService.displayNotification(notification);
-          }
           break;
         case NotificationEventType.Pressed:
           console.log(`User pressed notification`);
