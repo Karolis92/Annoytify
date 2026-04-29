@@ -331,7 +331,7 @@ internal object NotificationsManager {
     }
 
     if (notification != null) {
-      putExtra(
+      intent.putExtra(
         NotificationsConstants.extraNotificationJson,
         NotificationsJson.serializeNotification(notification)
       )
