@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
 class NotificationsBootReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
@@ -16,7 +16,7 @@ class NotificationsBootReceiver : BroadcastReceiver() {
     }
 
     val pendingResult = goAsync()
-    executor.execute {
+    thread(name = "AnnoytifyBootRestore") {
       try {
         NotificationsManager.restorePersistedNotifications(context.applicationContext)
       } catch (error: RuntimeException) {
@@ -32,7 +32,6 @@ class NotificationsBootReceiver : BroadcastReceiver() {
   }
 
   private companion object {
-    val executor = Executors.newSingleThreadExecutor()
     val supportedActions = setOf(
       Intent.ACTION_LOCKED_BOOT_COMPLETED,
       Intent.ACTION_BOOT_COMPLETED,

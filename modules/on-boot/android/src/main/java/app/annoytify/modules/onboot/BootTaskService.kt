@@ -11,7 +11,7 @@ class BootTaskService : HeadlessJsTaskService() {
     val action = intent?.action
 
     if (!BootBroadcastReceiver.supportedActions.contains(action)) {
-      Log.w(logTag, "Ignoring unsupported boot task action: $action")
+      Log.w(BootLogger.tag, "Ignoring unsupported boot task action: $action")
       return null
     }
 
@@ -23,9 +23,5 @@ class BootTaskService : HeadlessJsTaskService() {
       60_000,
       true
     )
-  }
-
-  private companion object {
-    const val logTag = "AnnoytifyBoot"
   }
 }

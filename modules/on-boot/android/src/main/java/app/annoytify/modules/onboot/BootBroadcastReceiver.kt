@@ -11,7 +11,7 @@ class BootBroadcastReceiver : BroadcastReceiver() {
     val action = intent?.action
 
     if (!supportedActions.contains(action)) {
-      Log.w(logTag, "Ignoring unsupported boot action: $action")
+      Log.w(BootLogger.tag, "Ignoring unsupported boot action: $action")
       return
     }
 
@@ -23,12 +23,11 @@ class BootBroadcastReceiver : BroadcastReceiver() {
         }
       )
     } catch (error: RuntimeException) {
-      Log.e(logTag, "Failed to start boot headless task for action=$action", error)
+      Log.e(BootLogger.tag, "Failed to start boot headless task for action=$action", error)
     }
   }
 
   companion object {
-    const val logTag = "AnnoytifyBoot"
     val supportedActions = setOf(
       Intent.ACTION_BOOT_COMPLETED,
       Intent.ACTION_MY_PACKAGE_REPLACED,

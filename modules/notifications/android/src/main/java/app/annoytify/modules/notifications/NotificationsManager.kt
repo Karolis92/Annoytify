@@ -19,7 +19,6 @@ internal object NotificationsManager {
   private const val notificationTagId = 0
   private const val defaultChannelId = "reminders"
   private const val defaultChannelName = "Reminders"
-  private const val defaultRequestCode = 0
 
   fun setNotificationChannels(
     context: Context,
@@ -339,7 +338,7 @@ internal object NotificationsManager {
 
     return PendingIntent.getBroadcast(
       context,
-      defaultRequestCode,
+      createRequestCode(id, "schedule"),
       intent,
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -367,7 +366,7 @@ internal object NotificationsManager {
 
     return PendingIntent.getBroadcast(
       context,
-      defaultRequestCode,
+      createRequestCode(notification.id, route),
       intent,
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -393,7 +392,7 @@ internal object NotificationsManager {
     return if (launchIntent != null) {
       PendingIntent.getActivity(
         context,
-        defaultRequestCode,
+        createRequestCode(notification.id, "content"),
         launchIntent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
       )
@@ -405,6 +404,10 @@ internal object NotificationsManager {
         route = "press"
       )
     }
+  }
+
+  private fun createRequestCode(id: String, route: String): Int {
+    return (31 * id.hashCode() + route.hashCode()) and Int.MAX_VALUE
   }
 
   private fun resolveSmallIcon(context: Context): Int {

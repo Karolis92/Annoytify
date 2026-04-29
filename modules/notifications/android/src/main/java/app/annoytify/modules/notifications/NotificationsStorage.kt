@@ -2,6 +2,7 @@ package app.annoytify.modules.notifications
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import org.json.JSONObject
 
 internal enum class PersistedReminderState(val value: String) {
@@ -11,7 +12,13 @@ internal enum class PersistedReminderState(val value: String) {
 
   companion object {
     fun from(value: String?): PersistedReminderState {
-      return values().firstOrNull { it.value == value } ?: Scheduled
+      return values().firstOrNull { it.value == value } ?: run {
+        Log.w(
+          NotificationsLogger.tag,
+          "Unknown persisted reminder state '$value', defaulting to scheduled."
+        )
+        Scheduled
+      }
     }
   }
 }
@@ -109,7 +116,12 @@ internal object NotificationsStorage {
 
     val appContext = context.applicationContext
     val deviceContext = appContext.createDeviceProtectedStorageContext() ?: appContext
-    deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)
+    if (!deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)) {
+      Log.w(
+        NotificationsLogger.tag,
+        "Shared preferences migration to device-protected storage did not complete."
+      )
+    }
     return deviceContext
   }
 }
