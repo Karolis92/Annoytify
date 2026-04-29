@@ -19,6 +19,7 @@ internal object NotificationsManager {
   private const val notificationTagId = 0
   private const val defaultChannelId = "reminders"
   private const val defaultChannelName = "Reminders"
+  private const val minimumScheduleDelayMillis = 1_000L
   private const val requestCodeHashPrime = 31L
   private const val requestCodeMask = 0x7fffffffL
 
@@ -197,7 +198,7 @@ internal object NotificationsManager {
     timestamp: Long
   ) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val triggerAtMillis = max(timestamp, System.currentTimeMillis() + 1_000)
+    val triggerAtMillis = max(timestamp, System.currentTimeMillis() + minimumScheduleDelayMillis)
     val pendingIntent = createSchedulePendingIntent(context, notification.id, notification)
 
     when {
@@ -408,6 +409,8 @@ internal object NotificationsManager {
     }
   }
 
+  // Combine the notification id and route into a stable positive request code so each
+  // PendingIntent remains distinct while still fitting within Android's signed Int API.
   private fun createRequestCode(id: String, route: String): Int {
     return ((id.hashCode() * requestCodeHashPrime + route.hashCode().toLong()) and
       requestCodeMask).toInt()

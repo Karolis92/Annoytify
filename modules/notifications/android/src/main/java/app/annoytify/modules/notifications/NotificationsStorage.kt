@@ -124,6 +124,8 @@ internal object NotificationsStorage {
       migrationAttempted.compareAndSet(false, true) &&
       !deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)
     ) {
+      // Fresh installs legitimately return false here because there is no credential-protected
+      // preferences file to migrate yet.
       Log.w(
         NotificationsLogger.tag,
         "Shared preferences migration to device-protected storage did not complete."

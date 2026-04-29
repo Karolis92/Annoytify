@@ -50,7 +50,10 @@ internal object NotificationEventDispatcher {
         }
       )
       true
-    } catch (error: RuntimeException) {
+    } catch (error: IllegalStateException) {
+      Log.e(NotificationsLogger.tag, "Failed to start notification headless task.", error)
+      false
+    } catch (error: SecurityException) {
       Log.e(NotificationsLogger.tag, "Failed to start notification headless task.", error)
       false
     }
