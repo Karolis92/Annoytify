@@ -19,6 +19,8 @@ internal object NotificationsManager {
   private const val notificationTagId = 0
   private const val defaultChannelId = "reminders"
   private const val defaultChannelName = "Reminders"
+  private const val requestCodeHashPrime = 31L
+  private const val requestCodeMask = 0x7fffffffL
 
   fun setNotificationChannels(
     context: Context,
@@ -407,7 +409,8 @@ internal object NotificationsManager {
   }
 
   private fun createRequestCode(id: String, route: String): Int {
-    return ((id.hashCode() * 31L + route.hashCode().toLong()) and 0x7fffffffL).toInt()
+    return ((id.hashCode() * requestCodeHashPrime + route.hashCode().toLong()) and
+      requestCodeMask).toInt()
   }
 
   private fun resolveSmallIcon(context: Context): Int {

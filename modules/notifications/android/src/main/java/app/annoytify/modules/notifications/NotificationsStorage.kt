@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal enum class PersistedReminderState(val value: String) {
   Scheduled("scheduled"),
@@ -33,8 +34,7 @@ internal object NotificationsStorage {
   private const val preferencesName = "annoytify-notifications"
   private const val channelsKey = "channels"
   private const val remindersKey = "reminders"
-  @Volatile
-  private var migrationAttempted = false
+  private val migrationAttempted = AtomicBoolean(false)
 
   fun setChannels(context: Context, channels: List<NotificationChannelRecord>) {
     val storedChannels = JSONObject().apply {
@@ -111,6 +111,8 @@ internal object NotificationsStorage {
   private fun preferences(context: Context) = storageContext(context)
     .getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
 
+  // Use device-protected storage so reminder state is available during LOCKED_BOOT_COMPLETED
+  // before the user unlocks the device, and migrate any existing credential-protected data once.
   private fun storageContext(context: Context): Context {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
       return context.applicationContext
@@ -118,13 +120,16 @@ internal object NotificationsStorage {
 
     val appContext = context.applicationContext
     val deviceContext = appContext.createDeviceProtectedStorageContext() ?: appContext
-    if (!migrationAttempted && !deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)) {
+    if (
+      migrationAttempted.compareAndSet(false, true) &&
+      !deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)
+    ) {
       Log.w(
         NotificationsLogger.tag,
         "Shared preferences migration to device-protected storage did not complete."
       )
     }
-    migrationAttempted = true
+
     return deviceContext
   }
 }
