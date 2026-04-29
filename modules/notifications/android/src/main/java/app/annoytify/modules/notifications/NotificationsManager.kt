@@ -407,7 +407,7 @@ internal object NotificationsManager {
   }
 
   private fun createRequestCode(id: String, route: String): Int {
-    return (id.hashCode() * 31 + route.hashCode()) and Int.MAX_VALUE
+    return ((id.hashCode() * 31L + route.hashCode().toLong()) and 0x7fffffffL).toInt()
   }
 
   private fun resolveSmallIcon(context: Context): Int {

@@ -33,6 +33,8 @@ internal object NotificationsStorage {
   private const val preferencesName = "annoytify-notifications"
   private const val channelsKey = "channels"
   private const val remindersKey = "reminders"
+  @Volatile
+  private var migrationAttempted = false
 
   fun setChannels(context: Context, channels: List<NotificationChannelRecord>) {
     val storedChannels = JSONObject().apply {
@@ -116,12 +118,13 @@ internal object NotificationsStorage {
 
     val appContext = context.applicationContext
     val deviceContext = appContext.createDeviceProtectedStorageContext() ?: appContext
-    if (!deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)) {
+    if (!migrationAttempted && !deviceContext.moveSharedPreferencesFrom(appContext, preferencesName)) {
       Log.w(
         NotificationsLogger.tag,
         "Shared preferences migration to device-protected storage did not complete."
       )
     }
+    migrationAttempted = true
     return deviceContext
   }
 }
