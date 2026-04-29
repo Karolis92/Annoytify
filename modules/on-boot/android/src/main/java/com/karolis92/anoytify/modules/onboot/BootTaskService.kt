@@ -6,12 +6,12 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 
 class BootTaskService : HeadlessJsTaskService() {
-    override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig? {
-        return HeadlessJsTaskConfig(
-            "annoytify-onboot",
-            Arguments.createMap(),
-            60_000, // timeout
-            true // allow in foreground
-        )
-    }
+  override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig? {
+    return HeadlessJsTaskConfig(
+      "annoytify-onboot",
+      Arguments.createMap(),
+      60_000, // timeout
+      true // allow in foreground
+    )
+  }
 }
