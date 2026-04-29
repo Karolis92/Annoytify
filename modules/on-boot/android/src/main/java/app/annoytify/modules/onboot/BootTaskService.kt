@@ -6,6 +6,7 @@ import com.facebook.react.HeadlessJsTaskService
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.jstasks.HeadlessJsTaskConfig
 
+// Runs after native boot restoration to reconcile SQLite task data with the native reminder store.
 class BootTaskService : HeadlessJsTaskService() {
   override fun getTaskConfig(intent: Intent?): HeadlessJsTaskConfig? {
     val action = intent?.action
