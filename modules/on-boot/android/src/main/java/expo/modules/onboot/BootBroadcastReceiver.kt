@@ -1,10 +1,10 @@
-package app.annoytify.modules.onboot
+package expo.modules.onboot
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.facebook.react.HeadlessJsTaskService
-import app.annoytify.modules.onboot.BootTaskService
+import expo.modules.onboot.BootTaskService
 
 class BootBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {

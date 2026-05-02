@@ -3,11 +3,11 @@ plugins {
   id 'expo-module-gradle-plugin'
 }
 
-group = 'app.annoytify.modules.onboot'
+group = 'expo.modules.onboot'
 version = '0.7.10'
 
 android {
-  namespace "app.annoytify.modules.onboot"
+  namespace "expo.modules.onboot"
   defaultConfig {
     versionCode 1
     versionName "0.7.10"

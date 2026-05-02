@@ -1,4 +1,4 @@
-package app.annoytify.modules.onboot
+package expo.modules.onboot
 
 import android.content.Intent
 import com.facebook.react.HeadlessJsTaskService
