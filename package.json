@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start:dev": "expo start",
-    "start:dev:emulator": "expo run:android",
+    "dev:start": "expo start",
+    "dev:run": "expo run:android",
     "build": "eas build --platform android",
     "build:dev": "npm run build -- --profile development",
     "build:preview": "npm run build -- --profile preview",
+    "build:local": "set APP_VARIANT=preview&& expo prebuild --platform android && cd android && gradlew assembleRelease",
     "generate:schema": "drizzle-kit generate",
     "format": "prettier . --write"
   },

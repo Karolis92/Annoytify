@@ -10,7 +10,7 @@ class BootTaskService : HeadlessJsTaskService() {
         return HeadlessJsTaskConfig(
             "annoytify-onboot",
             Arguments.createMap(),
-            0, // timeout
+            60_000, // timeout
             true // allow in foreground
         )
     }

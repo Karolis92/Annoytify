@@ -6,23 +6,27 @@ import notifee, {
 import { NotificationChannels } from "../../common/enums/NotificationChannels";
 
 class NotificationsService {
-  constructor() {
-    this.setup();
-  }
+  private channelPromise: Promise<string>;
 
-  private async setup() {
-    await notifee.createChannel({
+  constructor() {
+    this.channelPromise = notifee.createChannel({
       id: NotificationChannels.Reminders,
       name: "Reminders",
     });
+  }
+
+  async requestPermission() {
+    await this.channelPromise;
     await notifee.requestPermission();
   }
 
-  displayNotification(notification: Notification) {
+  async displayNotification(notification: Notification) {
+    await this.channelPromise;
     return notifee.displayNotification(notification);
   }
 
-  scheduleNotification(notification: Notification, time: Date) {
+  async scheduleNotification(notification: Notification, time: Date) {
+    await this.channelPromise;
     return notifee.createTriggerNotification(notification, {
       type: TriggerType.TIMESTAMP,
       timestamp: Math.max(time.getTime(), Date.now() + 1000),

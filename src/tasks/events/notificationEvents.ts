@@ -38,6 +38,7 @@ export const registerNotificationEventsListener = () => {
   return {
     useNotificationEvents: () => {
       useEffect(() => {
+        void notificationsService.requestPermission();
         const unsubscribe = notificationsService.onForegroundEvent(
           buildObserver("Foreground"),
         );
