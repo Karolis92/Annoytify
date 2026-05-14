@@ -1,48 +1,48 @@
-import notifee, {
-  Event,
+import {
+  cancelNotification,
+  canScheduleExactAlarms,
+  checkPermission,
+  displayNotification,
   Notification,
-  TriggerType,
-} from "@notifee/react-native";
-import { NotificationChannels } from "../../common/enums/NotificationChannels";
+  openExactAlarmSettings,
+  requestPermission,
+  scheduleNotification,
+} from "../../../modules/notifications";
 
 class NotificationsService {
-  private channelPromise: Promise<string>;
-
-  constructor() {
-    this.channelPromise = notifee.createChannel({
-      id: NotificationChannels.Reminders,
-      name: "Reminders",
-    });
-  }
-
   async requestPermission() {
-    await this.channelPromise;
-    await notifee.requestPermission();
+    return requestPermission();
   }
 
-  async displayNotification(notification: Notification) {
-    await this.channelPromise;
-    return notifee.displayNotification(notification);
+  checkPermission() {
+    return checkPermission();
   }
 
-  async scheduleNotification(notification: Notification, time: Date) {
-    await this.channelPromise;
-    return notifee.createTriggerNotification(notification, {
-      type: TriggerType.TIMESTAMP,
-      timestamp: Math.max(time.getTime(), Date.now() + 1000),
-    });
+  canScheduleExactAlarms() {
+    return canScheduleExactAlarms();
+  }
+
+  openExactAlarmSettings() {
+    return openExactAlarmSettings();
+  }
+
+  displayNotification(notification: Notification) {
+    return displayNotification(notification);
+  }
+
+  scheduleNotification(notification: Notification, time: Date) {
+    if (time <= new Date()) {
+      return displayNotification(notification).then(() => true);
+    }
+
+    return scheduleNotification(
+      notification,
+      Math.max(time.getTime(), Date.now() + 1000),
+    );
   }
 
   cancelNotification(id: string) {
-    return notifee.cancelNotification(id);
-  }
-
-  onBackgroundEvent(observer: (event: Event) => Promise<void>) {
-    return notifee.onBackgroundEvent(observer);
-  }
-
-  onForegroundEvent(observer: (event: Event) => Promise<void>) {
-    return notifee.onForegroundEvent(observer);
+    return cancelNotification(id);
   }
 }
 

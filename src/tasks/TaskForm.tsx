@@ -22,16 +22,18 @@ interface TaskFormProps {
   onClose: () => void;
 }
 
+const createEmptyFormState = () => ({
+  title: "",
+  description: "",
+  date: new Date(),
+  repeat: Repeat.No,
+  done: false,
+});
+
 const TaskForm = ({ taskId, onClose }: TaskFormProps) => {
   const [titleError, setTitleError] = useState<string>();
   const existingTask = useTask(taskId);
-  const [formState, setFormState] = useState(() => ({
-    title: existingTask?.title ?? "",
-    description: existingTask?.description ?? "",
-    date: existingTask?.date ?? new Date(),
-    repeat: existingTask?.repeat ?? Repeat.No,
-    done: existingTask?.done ?? false,
-  }));
+  const [formState, setFormState] = useState(createEmptyFormState);
 
   useEffect(() => {
     if (existingTask) {
@@ -42,8 +44,15 @@ const TaskForm = ({ taskId, onClose }: TaskFormProps) => {
         repeat: existingTask.repeat,
         done: existingTask.done,
       });
+      setTitleError(undefined);
+      return;
     }
-  }, [existingTask]);
+
+    if (!taskId) {
+      setFormState(createEmptyFormState());
+      setTitleError(undefined);
+    }
+  }, [existingTask, taskId]);
 
   const changeHandler =
     (field: string) =>

@@ -20,6 +20,10 @@ export class TasksRepository {
       .where(and(lte(tasks.date, new Date()), eq(tasks.done, false)));
   }
 
+  selectActive() {
+    return this.db.select().from(tasks).where(eq(tasks.done, false));
+  }
+
   async create(task: NewTask): Promise<Task> {
     const [createdTask] = await this.db.insert(tasks).values(task).returning();
     if (!createdTask) {

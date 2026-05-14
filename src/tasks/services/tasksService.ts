@@ -1,4 +1,4 @@
-import { Notification } from "@notifee/react-native";
+import { Notification } from "../../../modules/notifications";
 import { NewTask, Task } from "../../common/db/schema";
 import { NotificationChannels } from "../../common/enums/NotificationChannels";
 import { PressAction } from "../../common/enums/PressAction";
@@ -21,11 +21,18 @@ class TasksService {
     return this.repository.selectById(id);
   }
 
-  async restoreOngoingNotifications(): Promise<void> {
-    const ongoingTasks = await this.repository.selectOngoing();
+  async restoreNotifications(): Promise<void> {
+    const activeTasks = await this.repository.selectActive();
     await Promise.allSettled(
-      ongoingTasks.map((task) =>
-        notificationsService.displayNotification(this.createNotification(task)),
+      activeTasks.map((task) =>
+        task.date <= new Date()
+          ? notificationsService.displayNotification(
+              this.createNotification(task),
+            )
+          : notificationsService.scheduleNotification(
+              this.createNotification(task),
+              task.date,
+            ),
       ),
     );
   }
@@ -97,13 +104,10 @@ class TasksService {
         channelId: NotificationChannels.Reminders,
         ongoing: true,
         autoCancel: false,
-        pressAction: { id: PressAction.Default },
         actions: [
           {
+            id: PressAction.Done,
             title: "Done",
-            pressAction: {
-              id: PressAction.Done,
-            },
           },
         ],
       },

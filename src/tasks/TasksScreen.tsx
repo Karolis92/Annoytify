@@ -14,6 +14,7 @@ interface SheetState {
 const TasksScreen = () => {
   const taskRows = useTasks();
   const [sheetState, setSheetState] = useState<SheetState>({ open: false });
+  const closeSheet = () => setSheetState({ open: false });
 
   return (
     <View padding="$3" flex={1}>
@@ -41,12 +42,11 @@ const TasksScreen = () => {
 
       <Sheet
         open={sheetState.open}
-        onOpenChange={(open: boolean) => setSheetState({ ...sheetState, open })}
+        onOpenChange={(open: boolean) =>
+          setSheetState(open ? sheetState : { open: false })
+        }
       >
-        <TaskForm
-          taskId={sheetState.taskId}
-          onClose={() => setSheetState({ open: false })}
-        />
+        <TaskForm taskId={sheetState.taskId} onClose={closeSheet} />
       </Sheet>
     </View>
   );

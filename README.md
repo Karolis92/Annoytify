@@ -9,7 +9,7 @@ App is still work in progress
 
 ## Setup
 
-App will not work with Expo Go as it utilizes native code to restore notification after boot and requires development build.
+Annoytify is Android-only and will not work with Expo Go because it uses native modules for boot restoration and notification event handling.
 
 This repo uses `pnpm`. Enable Corepack and install dependencies with `corepack enable pnpm` and `pnpm install`.
 
@@ -32,3 +32,7 @@ Preview version for testing can also be built locally (`pnpm build:local`), buil
 `build:preview` - build preview app (apk) using EAS
 
 `build:local` - build preview app (apk) locally
+
+`generate:schema` - generate Drizzle migrations from schema changes
+
+`format` - run Prettier on the project
