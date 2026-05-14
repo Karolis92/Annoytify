@@ -66,7 +66,7 @@ app.config.js     # Expo config (reads APP_VARIANT env var)
 ## Code Conventions
 
 - Use TypeScript strict mode; all new code must be fully typed.
-- Follow existing Prettier formatting (`npm run format` applies it).
+- Follow existing Prettier formatting (`pnpm format` applies it).
 - Use `async/await` for asynchronous code.
 - Enums live in `src/common/enums/`; add new shared enums there.
 - Shared UI components go in `src/common/components/`.
@@ -77,13 +77,13 @@ app.config.js     # Expo config (reads APP_VARIANT env var)
 ## Development Scripts
 
 ```bash
-npm run dev:start      # Start Expo dev server (requires EAS dev build on device)
-npm run dev:run        # Build and run on local Android emulator or user device
-npm run build          # EAS production build (AAB)
-npm run build:dev      # EAS development build
-npm run build:preview  # EAS preview build (APK)
-npm run build:local    # Local APK build with Gradle
-npm run format         # Run Prettier on the whole project
+pnpm dev:start      # Start Expo dev server (requires EAS dev build on device)
+pnpm dev:run        # Build and run on local Android emulator or user device
+pnpm build          # EAS production build (AAB)
+pnpm build:dev      # EAS development build
+pnpm build:preview  # EAS preview build (APK)
+pnpm build:local    # Local APK build with Gradle
+pnpm format         # Run Prettier on the whole project
 ```
 
 ## Important Notes

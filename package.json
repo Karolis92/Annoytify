@@ -6,8 +6,8 @@
     "dev:start": "expo start",
     "dev:run": "expo run:android",
     "build": "eas build --platform android",
-    "build:dev": "npm run build -- --profile development",
-    "build:preview": "npm run build -- --profile preview",
+    "build:dev": "pnpm build --profile development",
+    "build:preview": "pnpm build --profile preview",
     "build:local": "set APP_VARIANT=preview&& expo prebuild --platform android && cd android && gradlew assembleRelease",
     "generate:schema": "drizzle-kit generate",
     "format": "prettier . --write"
@@ -16,8 +16,8 @@
     "@notifee/react-native": "^9.1.8",
     "@react-navigation/native": "^7.2.2",
     "@react-navigation/native-stack": "^7.14.10",
-    "@tamagui/config": "^2.0.0-rc.36",
-    "@tamagui/lucide-icons-2": "^2.0.0-rc.36",
+    "@tamagui/config": "2.0.0-rc.36",
+    "@tamagui/lucide-icons-2": "2.0.0-rc.36",
     "babel-plugin-inline-import": "^3.0.0",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.2",
@@ -35,7 +35,7 @@
     "react-native-screens": "~4.23.0",
     "react-native-svg": "^15.15.3",
     "react-native-web": "^0.21.2",
-    "tamagui": "^2.0.0-rc.36",
+    "tamagui": "2.0.0-rc.36",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -47,5 +47,5 @@
     "typescript": "~5.9.2"
   },
   "private": true,
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "pnpm@11.1.2+sha512.415a1cc25974731e75455c1468371be74c5aa5fb7621b50d4056d222451609f11412f23fd602e6169f1e060466641f798597e1be961a10688836a67b16569499"
 }
