@@ -1,9 +1,11 @@
 package expo.modules.notifications
 
 import android.content.Intent
+import android.util.Log
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 internal data class NotificationActionPayload(
@@ -67,6 +69,8 @@ internal data class NotificationPayload(
   }
 
   companion object {
+    private const val TAG = "AnnoytifyNotificationPayload"
+
     fun fromRecord(record: NativeNotificationRecord): NotificationPayload =
       NotificationPayload(
         id = record.id,
@@ -111,18 +115,23 @@ internal data class NotificationPayload(
         return emptyList()
       }
 
-      val actions = mutableListOf<NotificationActionPayload>()
-      val json = JSONArray(value)
-      for (index in 0 until json.length()) {
-        val action = json.getJSONObject(index)
-        actions.add(
-          NotificationActionPayload(
-            id = action.getString("id"),
-            title = action.getString("title")
+      return try {
+        val actions = mutableListOf<NotificationActionPayload>()
+        val json = JSONArray(value)
+        for (index in 0 until json.length()) {
+          val action = json.getJSONObject(index)
+          actions.add(
+            NotificationActionPayload(
+              id = action.getString("id"),
+              title = action.getString("title")
+            )
           )
-        )
+        }
+        actions
+      } catch (error: JSONException) {
+        Log.w(TAG, "Failed to parse notification actions; using no actions instead", error)
+        emptyList()
       }
-      return actions
     }
   }
 }
