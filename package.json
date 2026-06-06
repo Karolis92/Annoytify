@@ -10,6 +10,7 @@
     "build:preview": "pnpm build --profile preview",
     "build:local": "set APP_VARIANT=preview&& expo prebuild --platform android && cd android && gradlew assembleRelease",
     "generate:schema": "drizzle-kit generate",
+    "lint": "tsc --noEmit",
     "format": "prettier . --write"
   },
   "dependencies": {

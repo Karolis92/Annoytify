@@ -42,7 +42,7 @@ interface NotificationsModule {
 
 const nativeModule = requireNativeModule<NotificationsModule>("Notifications");
 
-export async function checkPermission(): Promise<boolean> {
+export async function checkNotificationsPermission(): Promise<boolean> {
   if (Platform.OS !== "android" || Platform.Version < 33) {
     return true;
   }
@@ -52,13 +52,13 @@ export async function checkPermission(): Promise<boolean> {
   );
 }
 
-export async function requestPermission(): Promise<boolean> {
+export async function requestNotificationsPermission(): Promise<boolean> {
   if (Platform.OS !== "android" || Platform.Version < 33) {
     return true;
   }
 
   const permission = PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS;
-  const hasPermission = await checkPermission();
+  const hasPermission = await checkNotificationsPermission();
   if (hasPermission) {
     return true;
   }

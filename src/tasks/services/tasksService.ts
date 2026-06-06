@@ -11,7 +11,13 @@ import { getTasksRepository, TasksRepository } from "../db/tasksRepository";
 import notificationsService from "./notificationsService";
 
 class TasksService {
+  private restoredNotifications = false;
+
   constructor(private repository: TasksRepository) {}
+
+  get hasRestoredNotifications() {
+    return this.restoredNotifications;
+  }
 
   selectAll() {
     return this.repository.selectAll();
@@ -35,6 +41,8 @@ class TasksService {
             ),
       ),
     );
+
+    this.restoredNotifications = true;
   }
 
   async create(task: NewTask): Promise<Task> {

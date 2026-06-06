@@ -1,25 +1,34 @@
 import {
   cancelNotification,
   canScheduleExactAlarms,
-  checkPermission,
+  checkNotificationsPermission,
   displayNotification,
   Notification,
   openExactAlarmSettings,
-  requestPermission,
+  requestNotificationsPermission,
   scheduleNotification,
 } from "../../../modules/notifications";
 
+export interface PermissionStatus {
+  canPostNotifications: boolean;
+  canScheduleAlarms: boolean;
+}
+
 class NotificationsService {
-  async requestPermission() {
-    return requestPermission();
+  async checkPermissions(): Promise<PermissionStatus> {
+    const [canPostNotifications, canScheduleAlarms] = await Promise.all([
+      checkNotificationsPermission(),
+      canScheduleExactAlarms(),
+    ]);
+
+    return {
+      canPostNotifications,
+      canScheduleAlarms,
+    };
   }
 
-  checkPermission() {
-    return checkPermission();
-  }
-
-  canScheduleExactAlarms() {
-    return canScheduleExactAlarms();
+  async requestNotificationsPermission() {
+    return requestNotificationsPermission();
   }
 
   openExactAlarmSettings() {
